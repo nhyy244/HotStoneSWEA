@@ -32,6 +32,7 @@ package hotstone.standard;
 
 import hotstone.framework.Card;
 import hotstone.framework.Player;
+import hotstone.framework.Status;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -66,18 +67,51 @@ public class TestAlphaStone {
   // and pushing the rest of the cards 1 position
   // 'down'
   @Test
-  public void shouldHaveUnoDosTresCardsInitially() {
+  public void findusShouldHaveUnoDosTresCardsInitially() {
     // Given a game, Findus has 3 cards in hand
     int count = game.getHandSize(Player.FINDUS);
     assertThat(count, is(3));
     // And these are ordered Tres, Dos, Uno in slot 0,1,2
 
-    // Given card 0 in the hand
-    Card card = game.getCardInHand(Player.FINDUS, 0);
-    // Then is it Tres
-    // ENABLE TO START TDD'ing
-    // assertThat(card.getName(), is(GameConstants.TRES_CARD));
+    Card card3 = game.getCardInHand(Player.FINDUS, 0);
+     assertThat(card3.getName(), is(GameConstants.TRES_CARD));
+
+    Card card2 = game.getCardInHand(Player.FINDUS, 1);
+    assertThat(card2.getName(), is(GameConstants.DOS_CARD));
+
+    Card card1 = game.getCardInHand(Player.FINDUS, 2);
+    assertThat(card1.getName(), is(GameConstants.UNO_CARD));
   }
+
+  @Test
+  public void shouldBeFinudsAtStartGame(){
+    Player player1 = game.getPlayerInTurn();
+    assertThat(player1, is(Player.FINDUS));
+  }
+
+  @Test
+  public void shouldBePeddersenAfterFindusEndsTurn(){
+    game.endTurn();
+    Player player2 = game.getPlayerInTurn();
+    assertThat(player2, is(Player.PEDDERSEN));
+  }
+ @Test
+ public void cardDosShouldHaveAttributes222(){
+    Card dos = game.getCardInHand(Player.FINDUS,1);
+    int dosMana = dos.getManaCost();
+    int dosHealth = dos.getHealth();
+    int dosAttack = dos.getAttack();
+    assertThat(dosMana, is(2));
+    assertThat(dosHealth,is(2));
+    assertThat(dosAttack,is(2));
+ }
+
+ @Test
+ public void unoIsOkToBePlayedAndAppearsAtIndex0OnField(){
+      Status ok = game.playCard(Player.FINDUS,game.getCardInHand(Player.FINDUS,2));
+      assertThat(ok,is(ok));
+      //assertThat();
+ }
 
   /** REMOVE ME. Not a test of HotStone, just an example of the
    matchers that the hamcrest library has... */
