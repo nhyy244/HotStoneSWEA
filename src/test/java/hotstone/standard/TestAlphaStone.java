@@ -30,9 +30,7 @@ package hotstone.standard;
  *      Aarhus University
  */
 
-import hotstone.framework.Card;
-import hotstone.framework.Player;
-import hotstone.framework.Status;
+import hotstone.framework.*;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -40,8 +38,6 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import hotstone.framework.Game;
 
 /** Template for your own ongoing TDD process.
  * Fill it out until you have covered all
@@ -112,6 +108,24 @@ public class TestAlphaStone {
       assertThat(ok,is(ok));
       //assertThat();
  }
+
+ @Test
+ public void usePowerShouldNoBeOkBecauseOfLowMana(){
+      Player p = game.getPlayerInTurn();
+      HeroImpl h = (HeroImpl)game.getHero(p);
+      h.setMana(1);
+      Status notOk= game.usePower(p);
+      assertThat(notOk, is(Status.NOT_ENOUGH_MANA));
+    }
+
+    @Test
+    public void usePowerShouldNoBeOkBecauseOfNotPlayerInTurn() {
+        Player p = game.getPlayerInTurn();
+        game.endTurn();
+        Status notOk = game.usePower(p);
+        assertThat(notOk, is(Status.NOT_PLAYER_IN_TURN));
+    }
+
 
   /** REMOVE ME. Not a test of HotStone, just an example of the
    matchers that the hamcrest library has... */

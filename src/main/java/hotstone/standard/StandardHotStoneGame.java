@@ -62,11 +62,13 @@ public class StandardHotStoneGame implements Game {
 
   private HashMap<Player,ArrayList<Card>> player1HandMap;
   private HashMap<Player,ArrayList<Card>> player2HandMap;
-  private HeroImpl player1Hero = new HeroImpl(GameConstants.BABY_HERO_TYPE,Player.FINDUS);
-  private HeroImpl player2Hero = new HeroImpl(GameConstants.BABY_HERO_TYPE,Player.PEDDERSEN);
+  private HeroImpl player1Hero;
+  private HeroImpl player2Hero;
 
 
   public StandardHotStoneGame(){
+    player1Hero = new HeroImpl(GameConstants.BABY_HERO_TYPE,Player.FINDUS);
+    player2Hero = new HeroImpl(GameConstants.BABY_HERO_TYPE,Player.PEDDERSEN);
     deck = new ArrayList<>();
     Collections.addAll(deck,uno,dos,tres,cuatro,cinco,seis,siete);
     player1DeckMap = new HashMap<>();
@@ -100,11 +102,12 @@ public class StandardHotStoneGame implements Game {
 
   @Override
   public Hero getHero(Player who) {
-    return null;
+    Hero h = (who.equals(Player.FINDUS))? player1Hero:player2Hero;
+    return h;
   }
 
   @Override
-  public Player getWinner() {
+  public Player getWinner() { //not implemented in alphaCiv
     return null;
   }
 
@@ -183,7 +186,7 @@ public class StandardHotStoneGame implements Game {
   }
 
   @Override
-  public Status usePower(Player who) { // NOT REQUIRED IN ALPHA STONE
+  public Status usePower(Player who) {
     if (!who.equals(getPlayerInTurn())){
       return Status.NOT_PLAYER_IN_TURN;
     }
