@@ -41,6 +41,9 @@ public class CardImpl implements Card {
     public boolean isActive() {
         return isActive;
     }
+    public void setActive(boolean isActive){
+        this.isActive=isActive;
+    }
 
     @Override
     public Player getOwner() {

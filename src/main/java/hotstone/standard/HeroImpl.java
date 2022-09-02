@@ -60,17 +60,26 @@ public class HeroImpl implements Hero {
     public ArrayList<Card> getField(){
         return field;
     }
+    public void updateField(Card c ){
+        field.add(0,c);
+    }
     public ArrayList<Card> getHand(){
         return hand;
     }
-    public void updateHand(ArrayList<Card> hand){
+    public void setHand(ArrayList<Card> hand){
         this.hand=hand;
+    }
+    public void updateHand(Card c){
+        hand.add(0,c);
     }
     public ArrayList<Card> getDeck(){
         return deck;
     }
-    public void updateDeck(ArrayList<Card> deck){
+    public void setDeck(ArrayList<Card> deck){
         this.deck=deck;
+    }
+    public void updateDeck(Card c ){
+        deck.add(c);
     }
 
 }
