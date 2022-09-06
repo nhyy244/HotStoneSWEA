@@ -49,4 +49,8 @@ public class CardImpl implements Card {
     public Player getOwner() {
         return owner;
     }
+
+    public void setHealth(int health){
+        this.health=health;
+    }
 }

@@ -31,6 +31,8 @@ package hotstone.standard;
  */
 
 import hotstone.framework.*;
+import hotstone.utility.TestHelper;
+import hotstone.variants.FindusWinsAt4RoundsStrategy;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ public class TestAlphaStone {
   /** Fixture for AlphaStone testing. */
   @BeforeEach
   public void setUp() {
-    game = new StandardHotStoneGame();
+    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy());
   }
 
   // The HotStone specs are quite insisting on how
@@ -302,5 +304,193 @@ public class TestAlphaStone {
         Status status = game.usePower(Player.PEDDERSEN);
         // Then it is not allowed as another player is in turn
         assertThat(status, is(Status.NOT_PLAYER_IN_TURN));
+    }
+
+    @Test
+    public void shouldDeclareFindusWinnerAfter4Rounds() {
+        // During first 4 rounds there is no winner
+        for (int i = 0; i < 4; i++) {
+            assertThat(game.getWinner(), is(nullValue()));
+            game.endTurn(); // over to Peddersen (turn 1, 3, 5, 7)
+            assertThat(game.getWinner(), is(nullValue()));
+            game.endTurn(); // over to Findus (turn 2, 4, 6, and then)
+        }
+        // Then Findus is declared winner
+        assertThat(game.getWinner(), is(Player.FINDUS));
+    }
+    @Test
+    public void shouldNotActWhenNotInTurn() {
+        // Given Peddersen is in turn
+        TestHelper.fieldTresForFindusAndDosForPeddersen(game);
+        game.endTurn();
+
+        // When Findus tries to play from hand (with low mana cost)
+        Card aCard = game.getCardInHand(Player.FINDUS, 2);
+        Status status = game.playCard(Player.FINDUS, aCard);
+        // Then it is NOT PLAYER IN TURN
+        assertThat(status, is(Status.NOT_PLAYER_IN_TURN));
+
+        // When Findus tries to attack from field
+        Card dos = game.getCardInField(Player.PEDDERSEN, 0);
+        Card tres = game.getCardInField(Player.FINDUS, 0);
+        // Then it is NOT PLAYER IN TURN
+        assertThat(game.attackCard(Player.FINDUS, tres, dos),
+                is(Status.NOT_PLAYER_IN_TURN));
+
+        // When Findus tries to attack Hero
+        // Then it is NOT PLAYER IN TURN
+        assertThat(game.attackHero(Player.FINDUS, tres),
+                is(Status.NOT_PLAYER_IN_TURN));
+    }
+
+    @Test
+    public void shouldNotActOnOpponentsBehalf() {
+        // Given Findus is in turn and has full mana
+        TestHelper.fieldTresForFindusAndDosForPeddersen(game);
+        game.endTurn();
+        game.endTurn();
+
+        // When Findus tries to field a card owned by Peddersen
+        Card aCard = game.getCardInHand(Player.PEDDERSEN, 3);
+        Status status = game.playCard(Player.FINDUS, aCard);
+        // Then it is not allowed as NOT OWNER
+        assertThat(status, is(Status.NOT_OWNER));
+
+        // When Findus tries to attack with Peddersens card
+        Card dos = game.getCardInField(Player.PEDDERSEN, 0);
+        Card tres = game.getCardInField(Player.FINDUS, 0);
+        status = game.attackCard(Player.FINDUS, dos, tres);
+        // Then it is NOT OWNER
+        assertThat(status, is(Status.NOT_OWNER));
+
+        // When Findus tries to attack Hero with Peddersens card
+        status = game.attackHero(Player.FINDUS, dos);
+        // Then it is NOT OWNER
+        assertThat(status, is(Status.NOT_OWNER));
+
+        // And of course if we reverse the situation, the same holds true
+        game.endTurn();
+
+        // When playing opponents card
+        aCard = game.getCardInHand(Player.FINDUS, 3);
+        status = game.playCard(Player.PEDDERSEN, aCard);
+        // Then it is not allowed as NOT OWNER
+        assertThat(status, is(Status.NOT_OWNER));
+
+        // When attacking with opponents card
+        status = game.attackCard(Player.PEDDERSEN, tres, dos);
+        // Then it is NOT OWNER
+        assertThat(status, is(Status.NOT_OWNER));
+    }
+    @Test
+    public void shouldNotAllowAttackingWithSleepingCard() {
+        // Given initial Game, with Uno fielded
+        Card uno = game.getCardInHand(Player.FINDUS, 2);
+        game.playCard(Player.FINDUS, uno);
+        // When Findus tries to attack hero with it
+        Status status = game.attackHero(Player.FINDUS, uno);
+        // Then it is not allowed due to sleeping card
+        assertThat(status, is(Status.ATTACK_NOT_ALLOWED_FOR_NON_ACTIVE_MINION));
+    }
+    @Test
+    public void shouldAllowAttackingHero() {
+        // Given a game with Tres available for Findus
+        TestHelper.fieldTresForFindusAndDosForPeddersen(game);
+        // When Findus attacks the Hero of Peddersen
+        Card tres = game.getCardInField(Player.FINDUS, 0);
+        Status status = game.attackHero(Player.FINDUS, tres);
+        // Then it is allowed
+        assertThat(status, is(Status.OK));
+        // And Peddersen's opponent has health reduced correctly
+        // which is initial health minus attack value of Tres
+        Hero Peddersen = game.getHero(Player.PEDDERSEN);
+        assertThat(Peddersen.getHealth(),
+                is(GameConstants.HERO_MAX_HEALTH - tres.getAttack()));
+
+        // And Tres is not active any more
+        assertThat(tres.isActive(), is(false));
+    }
+    @Test
+    public void shouldNotAttackYourOwnMinions() {
+        TestHelper.fieldTresForFindusAndDosForPeddersen(game);
+        // When Findus fields Uno
+        Card c = game.getCardInHand(Player.FINDUS, 2);
+        game.playCard(Player.FINDUS, c);
+
+        // When Findus attacks own Uno with Tres
+        Card tres = game.getCardInField(Player.FINDUS, 1);
+        Status status = game.attackCard(Player.FINDUS, tres, c);
+        assertThat(status, is(Status.ATTACK_NOT_ALLOWED_ON_OWN_MINION));
+    }
+    @Test
+    public void shouldRemoveCardForZeroHealth() {
+        // Late found bug - health == 0 is also removal cause!
+        // Given a game in which both field Uno
+        Card unoFindus = game.getCardInHand(Player.FINDUS, 2);
+        game.playCard(Player.FINDUS, unoFindus);
+        game.endTurn();
+        Card unoPeddersen = game.getCardInHand(Player.PEDDERSEN, 3);
+        game.playCard(Player.PEDDERSEN, unoPeddersen);
+        game.endTurn();
+
+        // When Findus attacks uno on uno
+        Status status = game.attackCard(Player.FINDUS, unoFindus, unoPeddersen);
+        // Then both cards are removed
+        assertThat(game.getFieldSize(Player.FINDUS), is(0));
+        assertThat(game.getFieldSize(Player.PEDDERSEN), is(0));
+    }
+    @Test
+    public void shouldRemoveAttackerAlsoIfHealthBelowZero() {
+        TestHelper.fieldTresForFindusAndDosForPeddersen(game);
+        // Given it is Peddersens's turn
+        game.endTurn();
+        // When he attacks Tres with Dos
+        Card tres = game.getCardInField(Player.FINDUS, 0);
+        Card dos = game.getCardInField(Player.PEDDERSEN, 0);
+        assertThat(game.attackCard(Player.PEDDERSEN, dos, tres),
+                is(Status.OK));
+        // Then Peddersen's card is removed from the field
+        assertThat(game.getFieldSize(Player.PEDDERSEN), is(0));
+    }
+    @Test
+    public void shouldNotAttackWithNonActiveMinion() {
+        // Given Findus has minion Tres and Peddersen minion Dos
+        TestHelper.fieldTresForFindusAndDosForPeddersen(game);
+
+        // When Findus fields Uno (entering index 0 on field)
+        Card uno = game.getCardInHand(Player.FINDUS,2);
+        assertThat(game.playCard(Player.FINDUS, uno), is(Status.OK));
+        assertThat(game.getCardInField(Player.FINDUS, 0).getName(),
+                is(GameConstants.UNO_CARD));
+        assertThat(game.getCardInField(Player.FINDUS, 0).isActive(), is(false));
+
+        // And immediately tries to attack Peddersen's at index 0
+        Card PeddersenDos = game.getCardInField(Player.PEDDERSEN, 0);
+        Status status = game.attackCard(Player.FINDUS, uno, PeddersenDos);
+        assertThat(status, is(Status.ATTACK_NOT_ALLOWED_FOR_NON_ACTIVE_MINION));
+
+        // Then Tres is allowed to attack (the card is active).
+        Card FindusTres = game.getCardInField(Player.FINDUS, 1);
+        status = game.attackCard(Player.FINDUS, FindusTres, PeddersenDos);
+        assertThat(status, is(Status.OK));
+    }
+    @Test
+    public void shouldAttackWithTresOnDos() {
+        // Given Findus has minion Tres and Peddersen minion Dos
+        TestHelper.fieldTresForFindusAndDosForPeddersen(game);
+        // When Findus attacks Dos
+        Card FindusTres = game.getCardInField(Player.FINDUS, 0);
+        Card PeddersenDos = game.getCardInField(Player.PEDDERSEN, 0);
+        Status status = game.attackCard(Player.FINDUS, FindusTres, PeddersenDos);
+        // Then the attack succeeds
+        assertThat(status, is(Status.OK));
+        // As Findus's Tres has attack 3 and Dos only has 2, Tres's health is now 1
+        Card tres = game.getCardInField(Player.FINDUS, 0);
+        assertThat(tres.getHealth(), is(1));
+        // And Tres is no longer active
+        assertThat(tres.isActive(), is(false));
+
+        // And Peddersen no longer has that minion fielded
+        assertThat(game.getFieldSize(Player.PEDDERSEN), is(0));
     }
 }
