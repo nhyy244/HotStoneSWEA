@@ -12,21 +12,18 @@ public class HeroImpl implements Hero {
     private String type;
     private Player owner;
     private String heroPower;
+    //private boolean active;
 
-    private ArrayList<Card> field;
-    private ArrayList<Card> hand;
-    private ArrayList<Card> deck;
 
-    public HeroImpl(String type,Player owner){
-        this.health=GameConstants.HERO_MAX_HEALTH;
-        this.type=type;
-        this.owner=owner;
-        mana=3;
-        this.heroPower="Cute";
-        field = new ArrayList<>();
-        hand = new ArrayList<>();
-        deck= new ArrayList<>();
+    public HeroImpl(String type, Player owner) {
+        this.health = GameConstants.HERO_MAX_HEALTH;
+        this.type = type;
+        this.owner = owner;
+        mana = 3;
+        this.heroPower = "Cute";
+        //active=false;
     }
+
     @Override
     public int getMana() {
         return mana;
@@ -41,6 +38,10 @@ public class HeroImpl implements Hero {
     public boolean isActive() {
         return false;
     }
+    /*
+    public void setActive(boolean active){
+        this.active=active;
+    }*/
 
     @Override
     public String getType() {
@@ -51,35 +52,15 @@ public class HeroImpl implements Hero {
     public Player getOwner() {
         return owner;
     }
-    public void setMana(int mana){
-        this.mana=mana;
+
+    public void setMana(int mana) {
+        this.mana = mana;
     }
-    public String getHeroPower(){
-        return heroPower;
-    }
-    public ArrayList<Card> getField(){
-        return field;
-    }
-    public void updateField(Card c ){
-        field.add(0,c);
-    }
-    public ArrayList<Card> getHand(){
-        return hand;
-    }
-    public void setHand(ArrayList<Card> hand){
-        this.hand=hand;
-    }
-    public void updateHand(Card c){
-        hand.add(0,c);
-    }
-    public ArrayList<Card> getDeck(){
-        return deck;
-    }
-    public void setDeck(ArrayList<Card> deck){
-        this.deck=deck;
-    }
-    public void updateDeck(Card c ){
-        deck.add(c);
+    public void setHealth(int health) {
+        this.health = health;
     }
 
+    public String getHeroPower() {
+        return heroPower;
+    }
 }

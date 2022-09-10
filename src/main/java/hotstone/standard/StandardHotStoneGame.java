@@ -20,10 +20,7 @@ package hotstone.standard;
 import hotstone.framework.*;
 import hotstone.variants.FindusWinsAt4RoundsStrategy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 /** This is the 'temporary test stub' in TDD
  * terms: the initial empty but compilable implementation
@@ -47,21 +44,11 @@ import java.util.HashMap;
  * why it is not called 'AlphaGame'.
  */
 public class StandardHotStoneGame implements Game {
-  private Card uno = new CardImpl(GameConstants.UNO_CARD,1,1,1);
-  private Card dos = new CardImpl(GameConstants.DOS_CARD,2,2,2);
-  private Card tres = new CardImpl(GameConstants.TRES_CARD,3,3,3);
-  private Card cuatro = new CardImpl(GameConstants.CUATRO_CARD,2,3,1);
-  private Card cinco = new CardImpl(GameConstants.CINCO_CARD,3,5,1);
-  private Card seis = new CardImpl(GameConstants.SEIS_CARD,2,1,3);
-  private Card siete = new CardImpl(GameConstants.SIETE_CARD,3,2,4);
-  private ArrayList<Card> deck1;
-  private ArrayList<Card> deck2;
-  private ArrayList<Card> hand1;
-  private ArrayList<Card> hand2;
+  private HashMap<Player, List<Card>> deck;
+  private HashMap<Player, HeroImpl> heroes;
+  private HashMap<Player, List<Card>> hand;
 
-  private final HeroImpl player1Hero;
-  private final HeroImpl player2Hero;
-
+  private HashMap<Player, List<Card>> field;
   private Player currentPlayerInTurn;
 
   private WinnerStrategy findusWinsAt4RoundsStrategy;
@@ -70,36 +57,69 @@ public class StandardHotStoneGame implements Game {
     this.findusWinsAt4RoundsStrategy = findusWinsAt4RoundsStrategy;
     currentPlayerInTurn = Player.FINDUS;
 
-    player1Hero = new HeroImpl(GameConstants.BABY_HERO_TYPE,Player.FINDUS);
-    player2Hero = new HeroImpl(GameConstants.BABY_HERO_TYPE,Player.PEDDERSEN);
-    deck1 = player1Hero.getDeck();
-    deck2 = player2Hero.getDeck();
-    Collections.addAll(deck1,uno,dos,tres,cuatro,cinco,seis,siete);
-    Collections.addAll(deck2,uno,dos,tres,cuatro,cinco,seis,siete);
-    player1Hero.setDeck(deck1);
-    player2Hero.setDeck(deck2);
+    deck = new HashMap<>();
+    heroes = new HashMap<>();
+    hand = new HashMap<>();
+    field = new HashMap<>();
+    generateHeroes(Player.FINDUS);
+    generateHeroes(Player.PEDDERSEN);
+    generateDeck(Player.FINDUS);
+    generateDeck(Player.PEDDERSEN);
+    generateHand(Player.FINDUS);
+    generateHand(Player.PEDDERSEN);
+    generateEmptyField(Player.FINDUS);
+    generateEmptyField(Player.PEDDERSEN);
 
-    hand1 = player1Hero.getHand();
-    hand2 = player2Hero.getHand();
 
-    for (int i=2;i>=0;i--){ //adds the first 3 cards from deck to both hands.
-      hand1.add(deck1.get(i));
-      deck1.remove(deck1.get(i));
-      hand2.add(deck2.get(i));
-      deck2.remove(deck2.get(i));
-    }
-    player1Hero.setHand(hand1);
-    player2Hero.setHand(hand2);
   }
+  private void generateDeck(Player who){
+    ArrayList<Card> Deck1 = new ArrayList<>();
+    Deck1.add(new CardImpl(GameConstants.UNO_CARD, 1, 1, 1, false, who));
+    Deck1.add(new CardImpl(GameConstants.DOS_CARD, 2, 2, 2, false, who));
+    Deck1.add(new CardImpl(GameConstants.TRES_CARD, 3, 3, 3, false, who));
+    Deck1.add(new CardImpl(GameConstants.CUATRO_CARD, 2, 3, 1, false, who));
+    Deck1.add(new CardImpl(GameConstants.CINCO_CARD, 3, 5, 1, false, who));
+    Deck1.add(new CardImpl(GameConstants.SEIS_CARD, 2, 1, 3, false, who));
+    Deck1.add(new CardImpl(GameConstants.SIETE_CARD, 3, 4, 2, false, who));
+    deck.put(who, Deck1);
+  }
+
+  private void generateHeroes(Player who){
+    HeroImpl tempHero;
+    if(who == Player.FINDUS) {
+      tempHero = new HeroImpl(GameConstants.BABY_HERO_TYPE,who);
+    }else{
+      tempHero = new HeroImpl(GameConstants.BABY_HERO_TYPE,who);
+    }
+    heroes.put(who, tempHero);
+  }
+
+  private void generateHand(Player who){
+    List<Card> tempHand = new ArrayList<>();
+    for(int i=0; i<3;i++){
+      tempHand.add(0,deck.get(who).get(i));
+    }
+    deck.get(who).remove(0);
+    deck.get(who).remove(0);
+    deck.get(who).remove(0);
+
+
+    hand.put(who,tempHand);
+  }
+  private void generateEmptyField(Player who){
+    ArrayList<Card> field1 = new ArrayList<>();
+    field.put(who,field1);
+  }
+
+
   public int roundNumber;
   @Override
   public Player getPlayerInTurn() {
     return currentPlayerInTurn;
   }
-
   @Override
   public Hero getHero(Player who) {
-    return (who.equals(Player.FINDUS))? player1Hero:player2Hero;
+    return heroes.get(who);
   }
 
   @Override
@@ -115,38 +135,38 @@ public class StandardHotStoneGame implements Game {
 
   @Override
   public int getDeckSize(Player who) {
-    return ((HeroImpl)getHero(who)).getDeck().size();
+    return deck.get(who).size();
 
   }
 
   @Override
   public Card getCardInHand(Player who, int indexInHand) {
-    return ((HeroImpl)getHero(who)).getHand().get(indexInHand);
+    return hand.get(who).get(indexInHand);
   }
 
   @Override
   public Iterable<? extends Card> getHand(Player who) {
-    return ((HeroImpl)getHero(who)).getHand();
+    return hand.get(who);
   }
 
   @Override
   public int getHandSize(Player who) {
-    return ((HeroImpl)getHero(who)).getHand().size();
+    return hand.get(who).size();
   }
 
   @Override
   public Card getCardInField(Player who, int indexInField) {
-    return ((HeroImpl)getHero(who)).getField().get(indexInField);
+    return field.get(who).get(indexInField);
   }
 
   @Override
   public Iterable<? extends Card> getField(Player who) {
-    return ((HeroImpl)getHero(who)).getField();
+    return field.get(who);
   }
 
   @Override
   public int getFieldSize(Player who) {
-    return ((HeroImpl)getHero(who)).getField().size();
+    return field.get(who).size();
   }
 
   @Override
@@ -154,68 +174,112 @@ public class StandardHotStoneGame implements Game {
     roundNumber++;
     currentPlayerInTurn =(getTurnNumber() %2 ==0)?Player.FINDUS:Player.PEDDERSEN; //computes playerInTurn
 
-    if(getPlayerInTurn().equals(Player.FINDUS)){
-      player1Hero.setMana(3);
-      ArrayList<Card> deck =player1Hero.getDeck();
-      player1Hero.updateHand(deck.get(0));
-      deck.remove(0);
+    if(getPlayerInTurn().equals(Player.FINDUS)) {
+      HeroImpl findusHero = heroes.get(Player.FINDUS);
+      List<Card> findusDeck = deck.get(Player.FINDUS);
+      findusHero.setMana(3);
+      hand.get(Player.FINDUS).add(0, findusDeck.get(0)); //adds card from deck to the hand.
+      findusDeck.remove(0);
+
+      //sets minions on field active
+      if (field.get(Player.FINDUS) != null) {
+        for (Card c : field.get(Player.FINDUS)) {
+          if (!(c.isActive())) {
+            ((CardImpl) c).setActive(true);
+          }
+        }
+      }
     }
-    else{
-      player2Hero.setMana(3);
-      ArrayList<Card> deck =player2Hero.getDeck();
-      player2Hero.updateHand(deck.get(0));
-      deck.remove(0);
+    else {
+      HeroImpl peddersenHero = heroes.get(Player.PEDDERSEN);
+      List<Card> peddersenDeck = deck.get(Player.PEDDERSEN);
+      peddersenHero.setMana(3);
+      hand.get(Player.PEDDERSEN).add(0, peddersenDeck.get(0)); //adds card from deck to the hand.
+      peddersenDeck.remove(0);
+      //sets minions on field active
+      if (field.get(Player.PEDDERSEN) != null) {
+        for (Card c : field.get(Player.PEDDERSEN)) {
+          if (!(c.isActive())) {
+            ((CardImpl) c).setActive(true);
+          }
+        }
+      }
     }
+
   }
 
   @Override
   public Status playCard(Player who, Card card) {
-    if(!who.equals(getPlayerInTurn())){
+    HeroImpl h = (HeroImpl) getHero(who);
+
+    if(!(who == getPlayerInTurn())){
       return Status.NOT_PLAYER_IN_TURN;
+    }
+    if(who != card.getOwner()){
+      return Status.NOT_OWNER;
     }
     if(getHero(who).getMana()<card.getManaCost()){
       return Status.NOT_ENOUGH_MANA;
     }
-    HeroImpl h = (HeroImpl) getHero(who);
-    ArrayList<CardImpl> hand = (ArrayList<CardImpl>) getHand(who);
-    for(CardImpl c : hand){
-      if(c.equals(card)){
-        h.updateField(c);
-        h.setMana(h.getMana()-card.getManaCost());
-        c.setActive(false);
-      }
-    }
-    h.getHand().remove(card);
+    h.setMana(h.getMana()- card.getManaCost()); //updates mana  when card is played
+    field.get(who).add(0,card); //updates field when card is played
+    hand.get(who).remove(card);
 
     return Status.OK;
   }
 
   @Override
   public Status attackCard(Player playerAttacking, Card attackingCard, Card defendingCard) {
-    if(!getPlayerInTurn().equals(playerAttacking)){
+    if(getPlayerInTurn() != playerAttacking){
       return Status.NOT_PLAYER_IN_TURN;
     }
-    if(attackingCard.isActive()){
+
+    if(!(attackingCard.isActive())){
       return Status.ATTACK_NOT_ALLOWED_FOR_NON_ACTIVE_MINION;
     }
-    /*if(defendingCard.getOwner().equals(getPlayerInTurn())){
+    if(defendingCard.getOwner().equals(getPlayerInTurn()) && attackingCard.getOwner().equals(getPlayerInTurn())){
       return Status.ATTACK_NOT_ALLOWED_ON_OWN_MINION;
-    }*/
+    }
     if(!attackingCard.getOwner().equals(getPlayerInTurn())){
-      return Status.NOT_ALLOWED_TO_ACT_ON_BEHALF_OF_OPPONENT;
+      return Status.NOT_OWNER;
     }
     ((CardImpl)attackingCard).setHealth(attackingCard.getHealth()-defendingCard.getAttack());
     ((CardImpl)defendingCard).setHealth(defendingCard.getHealth()-attackingCard.getAttack());
 
-    if(attackingCard.getHealth() ==0){
-      ((ArrayList<CardImpl>) getField(playerAttacking)).remove(attackingCard);
+    if(attackingCard.getHealth() <=0){
+      field.get(playerAttacking).remove(attackingCard);
+    }
+    else{
+      ((CardImpl) attackingCard).setActive(false);
+    }
+    if(defendingCard.getHealth() <=0){
+      field.get(defendingCard.getOwner()).remove(defendingCard);
     }
     return Status.OK;
   }
 
   @Override
   public Status attackHero(Player playerAttacking, Card attackingCard) {
-    return null;
+    if(getPlayerInTurn() != playerAttacking){
+      return Status.NOT_PLAYER_IN_TURN;
+    }
+    if(!(attackingCard.isActive())){
+      return Status.ATTACK_NOT_ALLOWED_FOR_NON_ACTIVE_MINION;
+    }
+    if(!attackingCard.getOwner().equals(getPlayerInTurn())){
+      return Status.NOT_OWNER;
+    }
+
+   if(playerAttacking == Player.FINDUS){
+     heroes.get(Player.PEDDERSEN).setHealth(heroes.get(Player.PEDDERSEN).getHealth()-attackingCard.getAttack());
+     ((CardImpl)attackingCard).setActive(false);
+   }
+   else{
+     heroes.get(Player.FINDUS).setHealth(heroes.get(Player.FINDUS).getHealth()-attackingCard.getAttack());
+     ((CardImpl)attackingCard).setActive(false);
+   }
+   return Status.OK;
+
   }
 
   @Override
@@ -227,6 +291,7 @@ public class StandardHotStoneGame implements Game {
       return Status.NOT_ENOUGH_MANA;
     }
     ((HeroImpl) getHero(who)).setMana(getHero(who).getMana() - GameConstants.HERO_POWER_COST);
+    //((HeroImpl))getHero(who).
     return Status.OK;
   }
 }

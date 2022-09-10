@@ -323,7 +323,6 @@ public class TestAlphaStone {
         // Given Peddersen is in turn
         TestHelper.fieldTresForFindusAndDosForPeddersen(game);
         game.endTurn();
-
         // When Findus tries to play from hand (with low mana cost)
         Card aCard = game.getCardInHand(Player.FINDUS, 2);
         Status status = game.playCard(Player.FINDUS, aCard);
@@ -381,6 +380,15 @@ public class TestAlphaStone {
         status = game.attackCard(Player.PEDDERSEN, tres, dos);
         // Then it is NOT OWNER
         assertThat(status, is(Status.NOT_OWNER));
+    }
+    @Test
+    public void shouldNotUseOpponentCard(){
+        // When Findus tries to field a card owned by Peddersen
+        Card aCard = game.getCardInHand(Player.PEDDERSEN, 2);
+        Status status = game.playCard(Player.FINDUS, aCard);
+        // Then it is not allowed as NOT OWNER
+        assertThat(status, is(Status.NOT_OWNER));
+
     }
     @Test
     public void shouldNotAllowAttackingWithSleepingCard() {
@@ -450,6 +458,10 @@ public class TestAlphaStone {
         assertThat(game.attackCard(Player.PEDDERSEN, dos, tres),
                 is(Status.OK));
         // Then Peddersen's card is removed from the field
+        for(Card c : game.getField(Player.PEDDERSEN)){
+            System.out.println(c.getHealth());
+
+        }
         assertThat(game.getFieldSize(Player.PEDDERSEN), is(0));
     }
     @Test

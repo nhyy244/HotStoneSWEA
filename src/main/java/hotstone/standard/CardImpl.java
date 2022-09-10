@@ -8,14 +8,16 @@ public class CardImpl implements Card {
     private int manaCost;
     private int health;
     private int attack;
-    private boolean isActive = false;
+    private boolean active;
     private Player owner;
 
-    public CardImpl(String name, int manaCost, int attack, int health){
+    public CardImpl(String name, int manaCost, int attack, int health,boolean active,Player owner ){
         this.name=name;
         this.manaCost=manaCost;
         this.health=health;
         this.attack=attack;
+        this.active=active;
+        this.owner=owner;
     }
     @Override
     public String getName() {
@@ -39,15 +41,19 @@ public class CardImpl implements Card {
 
     @Override
     public boolean isActive() {
-        return isActive;
+        return active;
     }
     public void setActive(boolean isActive){
-        this.isActive=isActive;
+        this.active=isActive;
     }
 
     @Override
     public Player getOwner() {
         return owner;
+    }
+
+    public void setOwner(Player owner){
+        this.owner = owner;
     }
 
     public void setHealth(int health){
