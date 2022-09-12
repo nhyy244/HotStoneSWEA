@@ -33,6 +33,7 @@ package hotstone.standard;
 import hotstone.framework.*;
 import hotstone.utility.TestHelper;
 import hotstone.variants.FindusWinsAt4RoundsStrategy;
+import hotstone.variants.ManaProductionAlphaStone;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class TestAlphaStone {
   /** Fixture for AlphaStone testing. */
   @BeforeEach
   public void setUp() {
-    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy());
+    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(),new ManaProductionAlphaStone());
   }
 
   // The HotStone specs are quite insisting on how

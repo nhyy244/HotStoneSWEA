@@ -19,7 +19,7 @@ public class HeroImpl implements Hero {
         this.health = GameConstants.HERO_MAX_HEALTH;
         this.type = type;
         this.owner = owner;
-        mana = 3;
+        this.mana=0;
         this.heroPower = "Cute";
         //active=false;
     }

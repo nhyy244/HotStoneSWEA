@@ -19,6 +19,7 @@ package hotstone.standard;
 
 import hotstone.framework.*;
 import hotstone.variants.FindusWinsAt4RoundsStrategy;
+import hotstone.variants.ManaProductionAlphaStone;
 
 import java.util.*;
 
@@ -51,10 +52,17 @@ public class StandardHotStoneGame implements Game {
   private HashMap<Player, List<Card>> field;
   private Player currentPlayerInTurn;
 
-  private WinnerStrategy findusWinsAt4RoundsStrategy;
+  private WinnerStrategy winnerStrategy;
+  private ManaProductionStrategy manaProductionStrategy;
+  private int turnNumber;
+  private int roundNumber;
 
-  public StandardHotStoneGame(WinnerStrategy findusWinsAt4RoundsStrategy){
-    this.findusWinsAt4RoundsStrategy = findusWinsAt4RoundsStrategy;
+
+  public StandardHotStoneGame(WinnerStrategy winnerStrategy,ManaProductionStrategy manaProductionStrategy){
+    this.winnerStrategy= winnerStrategy;
+    this.manaProductionStrategy=manaProductionStrategy;
+
+
     currentPlayerInTurn = Player.FINDUS;
 
     deck = new HashMap<>();
@@ -74,7 +82,7 @@ public class StandardHotStoneGame implements Game {
   }
   private void generateDeck(Player who){
     ArrayList<Card> Deck1 = new ArrayList<>();
-    Deck1.add(new CardImpl(GameConstants.UNO_CARD, 1, 1, 1, false, who));
+    Deck1.add(new CardImpl(GameConstants.UNO_CARD, 1, 21, 1, false, who));
     Deck1.add(new CardImpl(GameConstants.DOS_CARD, 2, 2, 2, false, who));
     Deck1.add(new CardImpl(GameConstants.TRES_CARD, 3, 3, 3, false, who));
     Deck1.add(new CardImpl(GameConstants.CUATRO_CARD, 2, 3, 1, false, who));
@@ -91,6 +99,7 @@ public class StandardHotStoneGame implements Game {
     }else{
       tempHero = new HeroImpl(GameConstants.BABY_HERO_TYPE,who);
     }
+    tempHero.setMana(1); //BetaStone
     heroes.put(who, tempHero);
   }
 
@@ -110,7 +119,6 @@ public class StandardHotStoneGame implements Game {
   }
 
 
-  public int roundNumber;
   @Override
   public Player getPlayerInTurn() {
     return currentPlayerInTurn;
@@ -122,7 +130,7 @@ public class StandardHotStoneGame implements Game {
 
   @Override
   public Player getWinner() {
-    return findusWinsAt4RoundsStrategy.getWinner(this);
+    return winnerStrategy.getWinner(this);
     //return null;
   }
 
@@ -169,15 +177,23 @@ public class StandardHotStoneGame implements Game {
 
   @Override
   public void endTurn() {
-    roundNumber++;
-    currentPlayerInTurn =(getTurnNumber() %2 ==0)?Player.FINDUS:Player.PEDDERSEN; //computes playerInTurn
-
+    turnNumber++;
+    currentPlayerInTurn =(turnNumber %2 ==0)?Player.FINDUS:Player.PEDDERSEN; //computes playerInTurn
+    if(turnNumber % 2 == 0){
+      roundNumber++;
+    }
+    //System.out.println(getTurnNumber());
     if(getPlayerInTurn().equals(Player.FINDUS)) {
       HeroImpl findusHero = heroes.get(Player.FINDUS);
       List<Card> findusDeck = deck.get(Player.FINDUS);
-      findusHero.setMana(3);
-      hand.get(Player.FINDUS).add(0, findusDeck.get(0)); //adds card from deck to the hand.
-      findusDeck.remove(0);
+      manaProductionStrategy.manaProduction(Player.FINDUS,this);
+      if(findusDeck.isEmpty()){
+        findusHero.setHealth(findusHero.getHealth()-2);
+      }
+      else{
+        hand.get(Player.FINDUS).add(0, findusDeck.get(0)); //adds card from deck to the hand.
+        findusDeck.remove(0);
+      }
 
       //sets minions on field active
       if (field.get(Player.FINDUS) != null) {
@@ -191,9 +207,16 @@ public class StandardHotStoneGame implements Game {
     else {
       HeroImpl peddersenHero = heroes.get(Player.PEDDERSEN);
       List<Card> peddersenDeck = deck.get(Player.PEDDERSEN);
-      peddersenHero.setMana(3);
-      hand.get(Player.PEDDERSEN).add(0, peddersenDeck.get(0)); //adds card from deck to the hand.
-      peddersenDeck.remove(0);
+      manaProductionStrategy.manaProduction(Player.PEDDERSEN,this);
+      if(peddersenDeck.isEmpty()){
+        peddersenHero.setHealth(peddersenHero.getHealth()-2);
+      }
+      else{
+        hand.get(Player.PEDDERSEN).add(0, peddersenDeck.get(0)); //adds card from deck to the hand.
+        peddersenDeck.remove(0);
+      }
+
+
       //sets minions on field active
       if (field.get(Player.PEDDERSEN) != null) {
         for (Card c : field.get(Player.PEDDERSEN)) {

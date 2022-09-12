@@ -11,7 +11,10 @@ public class ManaProductionBetaStone implements ManaProductionStrategy {
     public void manaProduction(Player who,Game game) {
         HeroImpl h = (HeroImpl) game.getHero(who);
         h.setMana(game.getTurnNumber());
-        if(game.getTurnNumber() >=7){
+        if(game.getTurnNumber() <=6) {//roundNumber starts at 0 in my game !
+            h.setMana(game.getTurnNumber()+1);
+        }
+        else{
             h.setMana(7);
         }
     }
