@@ -99,10 +99,8 @@ public class StandardHotStoneGame implements Game {
     for(int i=0; i<3;i++){
       tempHand.add(0,deck.get(who).get(i));
     }
-    deck.get(who).remove(0);
-    deck.get(who).remove(0);
-    deck.get(who).remove(0);
 
+    deck.get(who).subList(0, 3).clear(); //removes the first 3 cards from the deck.
 
     hand.put(who,tempHand);
   }
