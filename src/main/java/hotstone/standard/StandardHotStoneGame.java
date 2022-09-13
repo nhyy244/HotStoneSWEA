@@ -20,6 +20,8 @@ package hotstone.standard;
 import hotstone.framework.*;
 import hotstone.variants.FindusWinsAt4RoundsStrategy;
 import hotstone.variants.ManaProductionAlphaStone;
+import hotstone.variants.ManaProductionBetaStone;
+import hotstone.variants.WinnerStrategyBetaStone;
 
 import java.util.*;
 
@@ -78,9 +80,13 @@ public class StandardHotStoneGame implements Game {
     generateEmptyField(Player.FINDUS);
     generateEmptyField(Player.PEDDERSEN);
 
-
+    /*
+    * START MANA FOR BOTH PLAYERS ! AT ROUND START =0*/
+    manaProductionStrategy.manaProduction(Player.FINDUS,this);
+    manaProductionStrategy.manaProduction(Player.PEDDERSEN,this);
   }
   private void generateDeck(Player who){
+
     ArrayList<Card> Deck1 = new ArrayList<>();
     Deck1.add(new CardImpl(GameConstants.UNO_CARD, 1, 21, 1, false, who));
     Deck1.add(new CardImpl(GameConstants.DOS_CARD, 2, 2, 2, false, who));
@@ -99,7 +105,6 @@ public class StandardHotStoneGame implements Game {
     }else{
       tempHero = new HeroImpl(GameConstants.BABY_HERO_TYPE,who);
     }
-    tempHero.setMana(1); //BetaStone
     heroes.put(who, tempHero);
   }
 
