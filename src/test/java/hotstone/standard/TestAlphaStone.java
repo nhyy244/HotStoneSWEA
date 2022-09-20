@@ -32,8 +32,7 @@ package hotstone.standard;
 
 import hotstone.framework.*;
 import hotstone.utility.TestHelper;
-import hotstone.variants.FindusWinsAt4RoundsStrategy;
-import hotstone.variants.ManaProductionAlphaStone;
+import hotstone.variants.*;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -52,7 +51,8 @@ public class TestAlphaStone {
   /** Fixture for AlphaStone testing. */
   @BeforeEach
   public void setUp() {
-    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(),new ManaProductionAlphaStone());
+    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(),new ManaProductionAlphaStone(),new HeroGenerationStrategyAlpha(),
+            new HeroPowerStrategyAlpha(),new GenerateDeckStrategyAlpha());
   }
 
   // The HotStone specs are quite insisting on how
@@ -315,7 +315,6 @@ public class TestAlphaStone {
             game.endTurn(); // over to Peddersen (turn 1, 3, 5, 7)
             assertThat(game.getWinner(), is(nullValue()));
             game.endTurn(); // over to Findus (turn 2, 4, 6, and then)
-            System.out.println(game.getTurnNumber());
         }
         // Then Findus is declared winner
         assertThat(game.getWinner(), is(Player.FINDUS));

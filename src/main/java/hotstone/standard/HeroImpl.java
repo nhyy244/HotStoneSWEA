@@ -12,16 +12,16 @@ public class HeroImpl implements Hero {
     private String type;
     private Player owner;
     private String heroPower;
-    //private boolean active;
+    private boolean active;
 
 
-    public HeroImpl(String type, Player owner) {
+    public HeroImpl(String type, Player owner,String heroPower) {
         this.health = GameConstants.HERO_MAX_HEALTH;
         this.type = type;
         this.owner = owner;
         //this.mana=0;
-        this.heroPower = "Cute";
-        //active=false;
+        this.heroPower = heroPower;
+        this.active=false;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class HeroImpl implements Hero {
 
     @Override
     public boolean isActive() {
-        return false;
+        return active;
     }
     /*
     public void setActive(boolean active){
@@ -58,6 +58,9 @@ public class HeroImpl implements Hero {
     }
     public void setHealth(int health) {
         this.health = health;
+    }
+    public void setActive(boolean active){
+        this.active=active;
     }
 
     public String getHeroPower() {

@@ -59,4 +59,8 @@ public class CardImpl implements Card {
     public void setHealth(int health){
         this.health=health;
     }
+
+    public void setMana(int manaCost){
+        this.manaCost=manaCost;
+    }
 }
