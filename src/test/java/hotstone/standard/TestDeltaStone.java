@@ -119,7 +119,6 @@ public class TestDeltaStone {
         GenerateDeckStrategy deckStrategy = new GenerateDeckDelta();
         HashMap<Player,List<Card>> s = new HashMap<>();
         deckStrategy.generateDeck(Player.FINDUS,s);
-        System.out.println(s.get(Player.FINDUS).size());
         verfiyCardSpecs(s.get(Player.FINDUS),GameConstants.BROWN_RICE_CARD,1,1,2);
     }
 

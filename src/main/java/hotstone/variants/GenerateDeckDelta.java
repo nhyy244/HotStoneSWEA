@@ -12,6 +12,7 @@ public class GenerateDeckDelta implements GenerateDeckStrategy {
     @Override
     public void generateDeck(Player who, HashMap<Player, List<Card>> deck) {
         ArrayList<Card> Deck1 = new ArrayList<>();
+        ArrayList<Card> deck2 = new ArrayList<>();
 
         for(int i=0; i<2;i++) {
             Deck1.add(new CardImpl(GameConstants.BROWN_RICE_CARD, 1, 1, 2, false, who));
@@ -28,29 +29,17 @@ public class GenerateDeckDelta implements GenerateDeckStrategy {
             Deck1.add(new CardImpl(GameConstants.FILET_MIGNON_CARD, 7, 9, 5, false, who));
         }
         Collections.shuffle(Deck1);
-        Card one = cardShuffleBasedOnManaCost(Deck1,1);
-        Deck1.remove(one);
-        Deck1.add(0,one);
 
-        Card two = cardShuffleBasedOnManaCost(Deck1,2);
-        Deck1.remove(two);
-        Deck1.add(1,two);
-
-        Card three = cardShuffleBasedOnManaCost(Deck1,4);
-        Deck1.remove(three);
-        Deck1.add(2,three);
-
-        deck.put(who, Deck1);
-    }
-
-    private Card cardShuffleBasedOnManaCost(ArrayList<Card> deck, int manaCost){
-        ArrayList<Card>deckShuffled = new ArrayList<>();
-        Random r = new Random();
-        for (Card card : deck) {
-            if (card.getManaCost() <= manaCost) {
-                deckShuffled.add(card);
+        for(int i = 1; i <= 4; i=i*2) {
+            for (Card c: Deck1) {
+                if (c.getManaCost() <= i) {
+                    deck2.add(c);
+                    Deck1.remove(c);
+                    break;
+                }
             }
         }
-        return deckShuffled.get(r.nextInt(deckShuffled.size()));
+        deck2.addAll(Deck1);
+        deck.put(who,deck2);
     }
 }

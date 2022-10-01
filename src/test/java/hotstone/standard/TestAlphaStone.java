@@ -51,8 +51,11 @@ public class TestAlphaStone {
   /** Fixture for AlphaStone testing. */
   @BeforeEach
   public void setUp() {
-    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(),new ManaProductionAlphaStone(),new HeroGenerationStrategyAlpha(),
-            new HeroPowerStrategyAlpha(),new GenerateDeckStrategyAlpha());
+    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(),
+            new ManaProductionAlphaStone(),
+            new HeroGenerationStrategyAlpha(),
+            new HeroPowerStrategyAlpha(),
+            new GenerateDeckStrategyAlpha());
   }
 
   // The HotStone specs are quite insisting on how

@@ -66,12 +66,16 @@ public class StandardHotStoneGame implements Game {
   public StandardHotStoneGame(WinnerStrategy winnerStrategy,ManaProductionStrategy manaProductionStrategy,
                               HeroGenerationStrategy heroGenerationStrategy,HeroPowerStrategy heroPowerStrategy,
                               GenerateDeckStrategy generateDeckStrategy){
+
     this.winnerStrategy= winnerStrategy;
     this.manaProductionStrategy=manaProductionStrategy;
     this.heroGenerationStrategy=heroGenerationStrategy;
     this.heroPowerStrategy=heroPowerStrategy;
     this.generateDeckStrategy=generateDeckStrategy;
 
+    generateGameStart();
+  }
+  private void generateGameStart(){
     currentPlayerInTurn = Player.FINDUS;
 
     deck = new HashMap<>();
@@ -89,7 +93,7 @@ public class StandardHotStoneGame implements Game {
 
     ((HeroImpl)getHero(Player.FINDUS)).setActive(true);
     /*
-    * START MANA FOR BOTH PLAYERS ! AT ROUND START =0*/
+     * START MANA FOR BOTH PLAYERS ! AT ROUND START =0*/
     manaProductionStrategy.manaProduction(Player.FINDUS,this);
     manaProductionStrategy.manaProduction(Player.PEDDERSEN,this);
   }
@@ -180,10 +184,15 @@ public class StandardHotStoneGame implements Game {
     if(turnNumber % 2 == 0){ //computes roundNumber 2TurnNumber=1roundNumber
       roundNumber++;
     }
-    HeroImpl h = heroes.get(currentPlayerInTurn);
-    List<Card> d = deck.get(currentPlayerInTurn);
+    HeroImpl hero = heroes.get(currentPlayerInTurn);
+    List<Card> deckHero = deck.get(currentPlayerInTurn);
     manaProductionStrategy.manaProduction(currentPlayerInTurn,this);
-    h.setActive(true);
+
+    hero.setActive(true);
+    drawCard(hero,deckHero);
+    setMinionOnFieldActive();
+  }
+  private void drawCard(HeroImpl h, List<? extends Card> d ){
     if(d.isEmpty()){
       h.setHealth(h.getHealth()-2);
     }
@@ -191,6 +200,8 @@ public class StandardHotStoneGame implements Game {
       hand.get(currentPlayerInTurn).add(0, d.get(0)); //adds card from deck to the hand.
       d.remove(0);
     }
+  }
+  private void setMinionOnFieldActive(){
     //sets minions on field active
     if (field.get(currentPlayerInTurn) != null) {
       for (Card c : field.get(currentPlayerInTurn)) {
@@ -223,22 +234,30 @@ public class StandardHotStoneGame implements Game {
 
   @Override
   public Status attackCard(Player playerAttacking, Card attackingCard, Card defendingCard) {
+    boolean attackOnOwnMinion = defendingCard.getOwner().equals(getPlayerInTurn()) && attackingCard.getOwner().equals(getPlayerInTurn());
+    boolean ownerOfAttackCard = attackingCard.getOwner().equals(getPlayerInTurn());
     if(getPlayerInTurn() != playerAttacking){
       return Status.NOT_PLAYER_IN_TURN;
     }
-
     if(!(attackingCard.isActive())){
       return Status.ATTACK_NOT_ALLOWED_FOR_NON_ACTIVE_MINION;
     }
-    if(defendingCard.getOwner().equals(getPlayerInTurn()) && attackingCard.getOwner().equals(getPlayerInTurn())){
+    if(attackOnOwnMinion){
       return Status.ATTACK_NOT_ALLOWED_ON_OWN_MINION;
     }
-    if(!attackingCard.getOwner().equals(getPlayerInTurn())){
+    if(!ownerOfAttackCard){
       return Status.NOT_OWNER;
     }
     ((CardImpl)attackingCard).setHealth(attackingCard.getHealth()-defendingCard.getAttack());
     ((CardImpl)defendingCard).setHealth(defendingCard.getHealth()-attackingCard.getAttack());
 
+    checkMinionsFor0Health(playerAttacking,attackingCard,defendingCard);
+
+
+    return Status.OK;
+  }
+
+  private void checkMinionsFor0Health(Player playerAttacking, Card attackingCard, Card defendingCard){
     if(attackingCard.getHealth() <=0){
       field.get(playerAttacking).remove(attackingCard);
     }
@@ -248,7 +267,6 @@ public class StandardHotStoneGame implements Game {
     if(defendingCard.getHealth() <=0){
       field.get(defendingCard.getOwner()).remove(defendingCard);
     }
-    return Status.OK;
   }
 
   @Override
@@ -263,10 +281,14 @@ public class StandardHotStoneGame implements Game {
       return Status.NOT_OWNER;
     }
 
-    heroes.get(Utility.computeOpponent(playerAttacking))
-            .setHealth(heroes.get(Utility.computeOpponent(playerAttacking))
-            .getHealth()-attackingCard.getAttack());
+    Player opponentPlayer = Utility.computeOpponent(playerAttacking);
+    HeroImpl opponentHero = heroes.get(opponentPlayer);
+    int opponentHeroHealthAfterAttacked = opponentHero.getHealth()-attackingCard.getAttack();
+
+    opponentHero.setHealth(opponentHeroHealthAfterAttacked);
+
     ((CardImpl)attackingCard).setActive(false);
+
    return Status.OK;
 
   }
