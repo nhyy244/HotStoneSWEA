@@ -1,4 +1,4 @@
-package hotstone.variants;
+package hotstone.variants.delta;
 
 import hotstone.framework.Game;
 import hotstone.framework.ManaProductionStrategy;

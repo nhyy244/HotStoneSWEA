@@ -2,6 +2,8 @@ package hotstone.framework;
 
 import hotstone.standard.StandardHotStoneGame;
 
+import java.util.HashMap;
+
 public interface WinnerStrategy {
-    Player getWinner(StandardHotStoneGame game);
+    Player getWinner(Game game);
 }

@@ -18,10 +18,8 @@
 package hotstone.standard;
 
 import hotstone.framework.*;
-import hotstone.variants.FindusWinsAt4RoundsStrategy;
-import hotstone.variants.ManaProductionAlphaStone;
-import hotstone.variants.ManaProductionBetaStone;
-import hotstone.variants.WinnerStrategyBetaStone;
+import hotstone.variants.epsilon.TotalAttackOutputStrategyEpsilon;
+import hotstone.variants.factory.HotStoneFactory;
 
 import java.util.*;
 
@@ -59,19 +57,23 @@ public class StandardHotStoneGame implements Game {
   private HeroGenerationStrategy heroGenerationStrategy;
   private HeroPowerStrategy heroPowerStrategy;
   private GenerateDeckStrategy generateDeckStrategy;
+  private TotalAttackOutputStrategy totalAttackOutputStrategy;
   private int turnNumber;
   private int roundNumber;
+  private HashMap<Player,Integer> totalAttackOutput;
+  private HotStoneFactory hotStoneFactory;
 
 
-  public StandardHotStoneGame(WinnerStrategy winnerStrategy,ManaProductionStrategy manaProductionStrategy,
-                              HeroGenerationStrategy heroGenerationStrategy,HeroPowerStrategy heroPowerStrategy,
-                              GenerateDeckStrategy generateDeckStrategy){
+  public StandardHotStoneGame(HotStoneFactory hotStoneFactory){
+    this.hotStoneFactory = hotStoneFactory;
 
-    this.winnerStrategy= winnerStrategy;
-    this.manaProductionStrategy=manaProductionStrategy;
-    this.heroGenerationStrategy=heroGenerationStrategy;
-    this.heroPowerStrategy=heroPowerStrategy;
-    this.generateDeckStrategy=generateDeckStrategy;
+    this.winnerStrategy= hotStoneFactory.createWinnerStrategy();
+    this.manaProductionStrategy=hotStoneFactory.createManaProductionStrategy();
+    this.heroGenerationStrategy=hotStoneFactory.createHeroGenerationStrategy();
+    this.heroPowerStrategy=hotStoneFactory.createHeroPowerStrategy();
+    this.generateDeckStrategy=hotStoneFactory.createGenerateDeckStrategy();
+    this.totalAttackOutputStrategy = new TotalAttackOutputStrategyEpsilon();
+
 
     generateGameStart();
   }
@@ -82,6 +84,7 @@ public class StandardHotStoneGame implements Game {
     heroes = new HashMap<>();
     hand = new HashMap<>();
     field = new HashMap<>();
+    totalAttackOutput= new HashMap<>();
     generateHeroes(Player.FINDUS);
     generateHeroes(Player.PEDDERSEN);
     generateDeck(Player.FINDUS,deck);
@@ -91,11 +94,15 @@ public class StandardHotStoneGame implements Game {
     generateEmptyField(Player.FINDUS);
     generateEmptyField(Player.PEDDERSEN);
 
+
+
     ((HeroImpl)getHero(Player.FINDUS)).setActive(true);
     /*
      * START MANA FOR BOTH PLAYERS ! AT ROUND START =0*/
     manaProductionStrategy.manaProduction(Player.FINDUS,this);
     manaProductionStrategy.manaProduction(Player.PEDDERSEN,this);
+
+
   }
   private void generateDeck(Player who,HashMap<Player,List<Card>> deck){
     generateDeckStrategy.generateDeck(who,deck);
@@ -119,6 +126,10 @@ public class StandardHotStoneGame implements Game {
     ArrayList<Card> field1 = new ArrayList<>();
     field.put(who,field1);
   }
+  public List<Card> getFieldList(Player who){
+    return field.get(who);
+  }
+
 
 
   @Override
@@ -192,7 +203,7 @@ public class StandardHotStoneGame implements Game {
     drawCard(hero,deckHero);
     setMinionOnFieldActive();
   }
-  private void drawCard(HeroImpl h, List<? extends Card> d ){
+  public void drawCard(HeroImpl h, List<? extends Card> d ){
     if(d.isEmpty()){
       h.setHealth(h.getHealth()-2);
     }
@@ -200,6 +211,9 @@ public class StandardHotStoneGame implements Game {
       hand.get(currentPlayerInTurn).add(0, d.get(0)); //adds card from deck to the hand.
       d.remove(0);
     }
+  }
+  public List<Card> getDeck(Player who){
+    return deck.get(who);
   }
   private void setMinionOnFieldActive(){
     //sets minions on field active
@@ -248,6 +262,7 @@ public class StandardHotStoneGame implements Game {
     if(!ownerOfAttackCard){
       return Status.NOT_OWNER;
     }
+    totalAttackOutputStrategy.setTotalAttackOutput(playerAttacking,attackingCard,totalAttackOutput);
     ((CardImpl)attackingCard).setHealth(attackingCard.getHealth()-defendingCard.getAttack());
     ((CardImpl)defendingCard).setHealth(defendingCard.getHealth()-attackingCard.getAttack());
 
@@ -283,14 +298,17 @@ public class StandardHotStoneGame implements Game {
 
     Player opponentPlayer = Utility.computeOpponent(playerAttacking);
     HeroImpl opponentHero = heroes.get(opponentPlayer);
+    totalAttackOutputStrategy.setTotalAttackOutput(playerAttacking,attackingCard,totalAttackOutput);
     int opponentHeroHealthAfterAttacked = opponentHero.getHealth()-attackingCard.getAttack();
-
     opponentHero.setHealth(opponentHeroHealthAfterAttacked);
-
     ((CardImpl)attackingCard).setActive(false);
 
    return Status.OK;
 
+  }
+
+  public int getTotalAttackOutput(Player who){
+    return totalAttackOutput.get(who);
   }
 
   @Override

@@ -1,19 +1,19 @@
 package hotstone.standard;
 
 import hotstone.framework.Game;
-import hotstone.framework.Hero;
 import hotstone.framework.Player;
-import hotstone.variants.*;
+import hotstone.variants.delta.GenerateDeckDelta;
+import hotstone.variants.delta.ManaProductionDeltaStone;
+import hotstone.variants.epsilon.TotalAttackOutputStrategyEpsilon;
+import hotstone.variants.factory.DeltaStoneFactory;
+import hotstone.variants.gamma.HeroGenerationStrategyGamma;
+import hotstone.variants.gamma.HeroPowerGammaStone;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import hotstone.framework.*;
-import hotstone.utility.TestHelper;
-import hotstone.variants.FindusWinsAt4RoundsStrategy;
-import hotstone.variants.ManaProductionAlphaStone;
-import org.junit.jupiter.api.*;
+import hotstone.variants.alpha.FindusWinsAt4RoundsStrategy;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,9 +27,7 @@ public class TestDeltaStone {
 
     @BeforeEach
     public void setUp() {
-        game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(), new ManaProductionDeltaStone(),
-                new HeroGenerationStrategyGamma(), new HeroPowerGammaStone(),
-                new GenerateDeckDelta());
+        game = new StandardHotStoneGame(new DeltaStoneFactory());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package hotstone.variants;
+package hotstone.variants.alpha;
 
 import hotstone.framework.Card;
 import hotstone.framework.GenerateDeckStrategy;

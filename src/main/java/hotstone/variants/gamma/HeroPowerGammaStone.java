@@ -1,4 +1,4 @@
-package hotstone.variants;
+package hotstone.variants.gamma;
 
 import hotstone.framework.*;
 import hotstone.standard.CardImpl;

@@ -63,4 +63,8 @@ public class CardImpl implements Card {
     public void setMana(int manaCost){
         this.manaCost=manaCost;
     }
+
+    public void setAttack(int attack){
+        this.attack=attack;
+    }
 }
