@@ -1,9 +1,14 @@
 package hotstone.variants.factory;
 
 import hotstone.framework.*;
-import hotstone.variants.alpha.*;
+import hotstone.variants.alpha.FindusWinsAt4RoundsStrategy;
+import hotstone.variants.alpha.HeroGenerationStrategyAlpha;
+import hotstone.variants.delta.GenerateDeckDelta;
+import hotstone.variants.delta.ManaProductionDeltaStone;
+import hotstone.variants.eta.EffectStrategyEta;
+import hotstone.variants.eta.GenerateDeckStrategyEta;
 
-public class AlphaStoneFactory implements HotStoneFactory{
+public class EtaStoneFactory implements HotStoneFactory{
     @Override
     public WinnerStrategy createWinnerStrategy() {
         return new FindusWinsAt4RoundsStrategy();
@@ -11,7 +16,7 @@ public class AlphaStoneFactory implements HotStoneFactory{
 
     @Override
     public GenerateDeckStrategy createGenerateDeckStrategy() {
-        return new GenerateDeckStrategyAlpha();
+        return  new GenerateDeckStrategyEta();
     }
 
     @Override
@@ -21,11 +26,11 @@ public class AlphaStoneFactory implements HotStoneFactory{
 
     @Override
     public EffectStrategy createEffectStrategy() {
-        return new EffectStrategyAlpha();
+        return new EffectStrategyEta();
     }
 
     @Override
     public ManaProductionStrategy createManaProductionStrategy() {
-        return new ManaProductionAlphaStone();
+        return new ManaProductionDeltaStone();
     }
 }

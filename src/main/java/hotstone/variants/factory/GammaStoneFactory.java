@@ -5,7 +5,7 @@ import hotstone.variants.alpha.FindusWinsAt4RoundsStrategy;
 import hotstone.variants.alpha.GenerateDeckStrategyAlpha;
 import hotstone.variants.alpha.ManaProductionAlphaStone;
 import hotstone.variants.gamma.HeroGenerationStrategyGamma;
-import hotstone.variants.gamma.HeroPowerGammaStone;
+import hotstone.variants.gamma.EffectStrategyGammaStone;
 
 public class GammaStoneFactory implements HotStoneFactory{
     @Override
@@ -24,8 +24,8 @@ public class GammaStoneFactory implements HotStoneFactory{
     }
 
     @Override
-    public HeroPowerStrategy createHeroPowerStrategy() {
-        return new HeroPowerGammaStone();
+    public EffectStrategy createEffectStrategy() {
+        return new EffectStrategyGammaStone();
     }
 
     @Override

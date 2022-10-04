@@ -32,12 +32,6 @@ package hotstone.standard;
 
 import hotstone.framework.*;
 import hotstone.utility.TestHelper;
-import hotstone.variants.alpha.GenerateDeckStrategyAlpha;
-import hotstone.variants.alpha.HeroGenerationStrategyAlpha;
-import hotstone.variants.alpha.HeroPowerStrategyAlpha;
-import hotstone.variants.beta.ManaProductionBetaStone;
-import hotstone.variants.beta.WinnerStrategyBetaStone;
-import hotstone.variants.epsilon.TotalAttackOutputStrategyEpsilon;
 import hotstone.variants.factory.BetaStoneFactory;
 import org.junit.jupiter.api.*;
 

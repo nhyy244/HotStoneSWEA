@@ -1,10 +1,9 @@
 package hotstone.variants.factory;
 
 import hotstone.framework.*;
-import hotstone.variants.alpha.FindusWinsAt4RoundsStrategy;
 import hotstone.variants.alpha.GenerateDeckStrategyAlpha;
 import hotstone.variants.alpha.HeroGenerationStrategyAlpha;
-import hotstone.variants.alpha.HeroPowerStrategyAlpha;
+import hotstone.variants.alpha.EffectStrategyAlpha;
 import hotstone.variants.beta.ManaProductionBetaStone;
 import hotstone.variants.beta.WinnerStrategyBetaStone;
 
@@ -25,8 +24,8 @@ public class BetaStoneFactory implements HotStoneFactory{
     }
 
     @Override
-    public HeroPowerStrategy createHeroPowerStrategy() {
-        return new HeroPowerStrategyAlpha();
+    public EffectStrategy createEffectStrategy() {
+        return new EffectStrategyAlpha();
     }
 
     @Override

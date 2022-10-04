@@ -5,7 +5,7 @@ import hotstone.variants.alpha.GenerateDeckStrategyAlpha;
 import hotstone.variants.alpha.ManaProductionAlphaStone;
 import hotstone.variants.epsilon.EpsilonWinnerStrategy;
 import hotstone.variants.epsilon.HeroGenerationStrategyEpsilon;
-import hotstone.variants.epsilon.HeroPowerStrategyEpsilon;
+import hotstone.variants.epsilon.EffectStrategyAlpha;
 
 public class EpsilonStoneFactory implements HotStoneFactory {
     @Override
@@ -24,8 +24,8 @@ public class EpsilonStoneFactory implements HotStoneFactory {
     }
 
     @Override
-    public HeroPowerStrategy createHeroPowerStrategy() {
-        return new HeroPowerStrategyEpsilon();
+    public EffectStrategy createEffectStrategy() {
+        return new EffectStrategyAlpha();
     }
 
     @Override

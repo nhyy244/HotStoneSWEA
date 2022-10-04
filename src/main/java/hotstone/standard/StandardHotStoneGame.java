@@ -18,8 +18,8 @@
 package hotstone.standard;
 
 import hotstone.framework.*;
-import hotstone.variants.epsilon.TotalAttackOutputStrategyEpsilon;
 import hotstone.variants.factory.HotStoneFactory;
+import hotstone.variants.factory.ZetaStoneFactory;
 
 import java.util.*;
 
@@ -50,17 +50,18 @@ public class StandardHotStoneGame implements Game {
   private HashMap<Player, List<Card>> hand;
 
   private HashMap<Player, List<Card>> field;
+  private HashMap<Player,Integer> totalAttackOutput;
+
   private Player currentPlayerInTurn;
 
   private WinnerStrategy winnerStrategy;
+
   private ManaProductionStrategy manaProductionStrategy;
   private HeroGenerationStrategy heroGenerationStrategy;
-  private HeroPowerStrategy heroPowerStrategy;
+  private EffectStrategy effectStrategy;
   private GenerateDeckStrategy generateDeckStrategy;
-  private TotalAttackOutputStrategy totalAttackOutputStrategy;
   private int turnNumber;
   private int roundNumber;
-  private HashMap<Player,Integer> totalAttackOutput;
   private HotStoneFactory hotStoneFactory;
 
 
@@ -70,12 +71,12 @@ public class StandardHotStoneGame implements Game {
     this.winnerStrategy= hotStoneFactory.createWinnerStrategy();
     this.manaProductionStrategy=hotStoneFactory.createManaProductionStrategy();
     this.heroGenerationStrategy=hotStoneFactory.createHeroGenerationStrategy();
-    this.heroPowerStrategy=hotStoneFactory.createHeroPowerStrategy();
+    this.effectStrategy =hotStoneFactory.createEffectStrategy();
     this.generateDeckStrategy=hotStoneFactory.createGenerateDeckStrategy();
-    this.totalAttackOutputStrategy = new TotalAttackOutputStrategyEpsilon();
 
 
     generateGameStart();
+
   }
   private void generateGameStart(){
     currentPlayerInTurn = Player.FINDUS;
@@ -93,6 +94,9 @@ public class StandardHotStoneGame implements Game {
     generateHand(Player.PEDDERSEN);
     generateEmptyField(Player.FINDUS);
     generateEmptyField(Player.PEDDERSEN);
+    generateEmptyAttackOutput(Player.FINDUS);
+    generateEmptyAttackOutput(Player.PEDDERSEN);
+
 
 
 
@@ -125,6 +129,9 @@ public class StandardHotStoneGame implements Game {
   private void generateEmptyField(Player who){
     ArrayList<Card> field1 = new ArrayList<>();
     field.put(who,field1);
+  }
+  private void generateEmptyAttackOutput(Player who){
+    totalAttackOutput.put(who,0);
   }
   public List<Card> getFieldList(Player who){
     return field.get(who);
@@ -241,6 +248,7 @@ public class StandardHotStoneGame implements Game {
     }
     h.setMana(h.getMana()- card.getManaCost()); //updates mana  when card is played
     field.get(who).add(0,card); //updates field when card is played
+    effectStrategy.applyCardEffects(this,who,card);
     hand.get(who).remove(card);
 
     return Status.OK;
@@ -262,7 +270,8 @@ public class StandardHotStoneGame implements Game {
     if(!ownerOfAttackCard){
       return Status.NOT_OWNER;
     }
-    totalAttackOutputStrategy.setTotalAttackOutput(playerAttacking,attackingCard,totalAttackOutput);
+    winnerStrategy.setTotalAttackOutput(playerAttacking,attackingCard,totalAttackOutput);
+
     ((CardImpl)attackingCard).setHealth(attackingCard.getHealth()-defendingCard.getAttack());
     ((CardImpl)defendingCard).setHealth(defendingCard.getHealth()-attackingCard.getAttack());
 
@@ -298,7 +307,8 @@ public class StandardHotStoneGame implements Game {
 
     Player opponentPlayer = Utility.computeOpponent(playerAttacking);
     HeroImpl opponentHero = heroes.get(opponentPlayer);
-    totalAttackOutputStrategy.setTotalAttackOutput(playerAttacking,attackingCard,totalAttackOutput);
+    winnerStrategy.setTotalAttackOutput(playerAttacking,attackingCard,totalAttackOutput);
+
     int opponentHeroHealthAfterAttacked = opponentHero.getHealth()-attackingCard.getAttack();
     opponentHero.setHealth(opponentHeroHealthAfterAttacked);
     ((CardImpl)attackingCard).setActive(false);
@@ -323,7 +333,7 @@ public class StandardHotStoneGame implements Game {
       return Status.POWER_USE_NOT_ALLOWED_TWICE_PR_ROUND;
     }
     ((HeroImpl) getHero(who)).setMana(getHero(who).getMana() - GameConstants.HERO_POWER_COST);
-    heroPowerStrategy.usePower(who,this);
+    effectStrategy.usePower(who,this);
     ((HeroImpl) getHero(who)).setActive(false);
 
     //((HeroImpl))getHero(who).

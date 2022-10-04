@@ -7,6 +7,6 @@ public interface HotStoneFactory {
     WinnerStrategy createWinnerStrategy();
     GenerateDeckStrategy createGenerateDeckStrategy();
     HeroGenerationStrategy createHeroGenerationStrategy();
-    HeroPowerStrategy createHeroPowerStrategy();
+    EffectStrategy createEffectStrategy();
     ManaProductionStrategy createManaProductionStrategy();
 }

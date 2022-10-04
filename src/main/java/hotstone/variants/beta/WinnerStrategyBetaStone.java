@@ -1,10 +1,9 @@
 package hotstone.variants.beta;
 
-import hotstone.framework.Game;
-import hotstone.framework.Hero;
-import hotstone.framework.Player;
-import hotstone.framework.WinnerStrategy;
+import hotstone.framework.*;
 import hotstone.standard.StandardHotStoneGame;
+
+import java.util.HashMap;
 
 public class WinnerStrategyBetaStone implements WinnerStrategy {
     @Override
@@ -18,5 +17,9 @@ public class WinnerStrategyBetaStone implements WinnerStrategy {
             return Player.FINDUS;
         }
         return null;
+    }
+
+    @Override
+    public void setTotalAttackOutput(Player who, Card attackingCard, HashMap<Player, Integer> totalAttackOutputMap) {
     }
 }

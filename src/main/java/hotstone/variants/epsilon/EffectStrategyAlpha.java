@@ -2,14 +2,12 @@ package hotstone.variants.epsilon;
 
 import hotstone.framework.*;
 import hotstone.standard.CardImpl;
-import hotstone.standard.GameConstants;
 import hotstone.standard.HeroImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class HeroPowerStrategyEpsilon implements HeroPowerStrategy {
+public class EffectStrategyAlpha implements EffectStrategy {
 
     @Override
     public void usePower(Player who, Game game) {
@@ -34,5 +32,10 @@ public class HeroPowerStrategyEpsilon implements HeroPowerStrategy {
             ((CardImpl) c).setAttack(c.getAttack()+2);
             System.out.println("M: (+2,0)");
         }
+    }
+
+    @Override
+    public void applyCardEffects(Game game, Player who, Card card) {
+
     }
 }

@@ -1,19 +1,14 @@
 package hotstone.standard;
 
-import hotstone.TestStubs.FixedHeroPowerStrategy;
+import hotstone.TestStubs.FixedEffectStrategyTest;
 import hotstone.framework.Game;
 import hotstone.framework.Hero;
 import hotstone.framework.Player;
-import hotstone.variants.alpha.GenerateDeckStrategyAlpha;
-import hotstone.variants.epsilon.EpsilonWinnerStrategy;
-import hotstone.variants.epsilon.HeroGenerationStrategyEpsilon;
-import hotstone.variants.epsilon.HeroPowerStrategyEpsilon;
-import hotstone.variants.epsilon.TotalAttackOutputStrategyEpsilon;
+import hotstone.utility.TestHelper;
 import hotstone.variants.factory.EpsilonStoneFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import hotstone.framework.*;
-import hotstone.variants.alpha.ManaProductionAlphaStone;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,14 +46,14 @@ public class TestEpsilonStone {
     @Test
     public void findusHeroPowerShouldReduceMinionAttackBy2(){
         CardImpl c =new CardImpl(GameConstants.TRES_CARD, 3, 3, 3, false, Player.PEDDERSEN);
-        HeroPowerStrategy fixedHeroPower = new FixedHeroPowerStrategy(c);
+        EffectStrategy fixedHeroPower = new FixedEffectStrategyTest(c);
         fixedHeroPower.usePower(Player.FINDUS,game);
         assertThat(c.getAttack(),is(1));
     }
     @Test
     public void peddersenHeroPowerShouldIncreaseOwnMinionAttackBy2(){
         CardImpl c =new CardImpl(GameConstants.TRES_CARD, 3, 3, 3, false, Player.PEDDERSEN);
-        HeroPowerStrategy fixedHeroPower = new FixedHeroPowerStrategy(c);
+        EffectStrategy fixedHeroPower = new FixedEffectStrategyTest(c);
         fixedHeroPower.usePower(Player.PEDDERSEN,game);
         assertThat(c.getAttack(),is(5));
     }

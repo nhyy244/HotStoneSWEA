@@ -1,6 +1,6 @@
 package hotstone.standard;
 
-import hotstone.TestStubs.GameDoubleForZetaStone;
+import hotstone.TestStubs.GameDouble;
 import hotstone.framework.Game;
 import hotstone.framework.Player;
 import hotstone.utility.TestHelper;
@@ -26,7 +26,7 @@ public class TestZetaStone {
     @BeforeEach
     public void setUp(){
         game = new StandardHotStoneGame(new ZetaStoneFactory());
-        gameDouble = new GameDoubleForZetaStone(new ZetaStoneFactory());
+        gameDouble = new GameDouble(new ZetaStoneFactory());
     }
 
     @Test
@@ -67,18 +67,18 @@ public class TestZetaStone {
     }
     @Test
     public void FindusShouldBeWinnerWhenPeddersen0Health(){
-        ((HeroImpl)gameDouble.getHero(Player.PEDDERSEN)).setHealth(0);
-        assertThat(gameDouble.getWinner(),is(Player.FINDUS));
+        ((HeroImpl)game.getHero(Player.PEDDERSEN)).setHealth(0);
+        assertThat(game.getWinner(),is(Player.FINDUS));
     }
     @Test
     public void PeddersenShouldBeWinnerWhenFindus0Health(){
-        ((HeroImpl)gameDouble.getHero(Player.FINDUS)).setHealth(0);
-        assertThat(gameDouble.getWinner(),is(Player.PEDDERSEN));
+        ((HeroImpl)game.getHero(Player.FINDUS)).setHealth(0);
+        assertThat(game.getWinner(),is(Player.PEDDERSEN));
     }
     @Test
     public void FindusShouldBeWinnerAfter6RoundsPlus(){
+        assertThat(game.getWinner(),is(nullValue())); //before 7 rounds
         TestHelper.advanceGameNRounds(game,7);
-        assertThat(game.getTurnNumber(),is(7));
         assertThat(game.getPlayerInTurn(),is(Player.FINDUS));
         Status playCard1 = game.playCard(Player.FINDUS,game.getCardInHand(Player.FINDUS,0)); //findus has 0 mana now, att =3
         game.endTurn();
@@ -92,9 +92,10 @@ public class TestZetaStone {
         assertThat(playCard3,is(Status.OK));
         game.endTurn();
         game.endTurn();
-        Status attackHero1 =  game.attackHero(Player.FINDUS,game.getCardInField(Player.FINDUS,2));
+        game.attackHero(Player.FINDUS,game.getCardInField(Player.FINDUS,2));
+        game.getWinner();
+        ((StandardHotStoneGame)game).getTotalAttackOutput(Player.PEDDERSEN);
         assertThat(game.getWinner(),is(nullValue()));
-        assertThat(attackHero1,is(Status.OK));
         assertThat( ((StandardHotStoneGame)game).getTotalAttackOutput(Player.FINDUS),is(5));
         game.attackHero(Player.FINDUS,game.getCardInField(Player.FINDUS,1));
         assertThat(((StandardHotStoneGame)game).getTotalAttackOutput(Player.FINDUS),is(10));

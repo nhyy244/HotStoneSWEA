@@ -32,8 +32,6 @@ package hotstone.standard;
 
 import hotstone.framework.*;
 import hotstone.utility.TestHelper;
-import hotstone.variants.alpha.*;
-import hotstone.variants.epsilon.TotalAttackOutputStrategyEpsilon;
 import hotstone.variants.factory.AlphaStoneFactory;
 import org.junit.jupiter.api.*;
 

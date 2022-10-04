@@ -3,16 +3,11 @@ package hotstone.standard;
 import hotstone.framework.Game;
 import hotstone.framework.Player;
 import hotstone.variants.delta.GenerateDeckDelta;
-import hotstone.variants.delta.ManaProductionDeltaStone;
-import hotstone.variants.epsilon.TotalAttackOutputStrategyEpsilon;
 import hotstone.variants.factory.DeltaStoneFactory;
-import hotstone.variants.gamma.HeroGenerationStrategyGamma;
-import hotstone.variants.gamma.HeroPowerGammaStone;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import hotstone.framework.*;
-import hotstone.variants.alpha.FindusWinsAt4RoundsStrategy;
 
 import java.util.HashMap;
 import java.util.List;

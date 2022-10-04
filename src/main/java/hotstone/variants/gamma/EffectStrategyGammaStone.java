@@ -4,7 +4,7 @@ import hotstone.framework.*;
 import hotstone.standard.CardImpl;
 import hotstone.standard.HeroImpl;
 
-public class HeroPowerGammaStone implements HeroPowerStrategy {
+public class EffectStrategyGammaStone implements EffectStrategy {
     @Override
     public void usePower(Player who, Game game) {
         HeroImpl h = (HeroImpl) game.getHero(who);
@@ -19,5 +19,10 @@ public class HeroPowerGammaStone implements HeroPowerStrategy {
             game.playCard(who,sovsCard);
             System.out.println("Field Sovs");
         }
+    }
+
+    @Override
+    public void applyCardEffects(Game game, Player who, Card card) {
+
     }
 }
