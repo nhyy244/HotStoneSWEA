@@ -27,7 +27,14 @@ public class ZetaStoneFactory implements HotStoneFactory{
 
     @Override
     public EffectStrategy createEffectStrategy() {
+        if(2==2){
+            System.out.println("2");
+        }
+        else{
+            System.out.println("s");
+        }
         return new EffectStrategyAlpha();
+
     }
 
     @Override

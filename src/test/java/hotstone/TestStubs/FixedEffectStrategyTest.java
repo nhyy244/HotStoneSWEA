@@ -14,7 +14,7 @@ public class FixedEffectStrategyTest implements EffectStrategy {
         this.c= c;
     }
     @Override
-    public void usePower(Player who, Game game) {
+    public void usePower(Player who, MutableGame game) {
         HeroImpl h = (HeroImpl) game.getHero(who);
         String heroPower = h.getHeroPower();
 
@@ -29,7 +29,7 @@ public class FixedEffectStrategyTest implements EffectStrategy {
     }
 
     @Override
-    public void applyCardEffects(Game game, Player who, Card card) {
+    public void applyCardEffects(MutableGame game, Player who, Card card) {
         HeroImpl opponentHero = (HeroImpl)game.getHero(Utility.computeOpponent(who));
         HeroImpl playerInTurnHero = (HeroImpl)game.getHero(who);
         Random r = new Random();
@@ -53,7 +53,8 @@ public class FixedEffectStrategyTest implements EffectStrategy {
                 break;
 
             case GameConstants.NOODLE_SOUP_CARD:
-                ((StandardHotStoneGame)game).drawCard(playerInTurnHero,((StandardHotStoneGame) game).getDeck(who));
+                game.drawCardFromDeck(game.getPlayerInTurn());
+                //((StandardHotStoneGame)game).drawCard(playerInTurnHero,((StandardHotStoneGame) game).getDeck(who));
                 System.out.println("Draw Card");
                 break;
             case GameConstants.CHICKEN_CURRY_CARD:

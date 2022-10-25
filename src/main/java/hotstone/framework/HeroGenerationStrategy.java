@@ -7,5 +7,5 @@ import java.util.HashMap;
 
 public interface HeroGenerationStrategy {
 
-    void generateHeroes(Player who, HashMap<Player, HeroImpl> heroes);
+    void generateHeroes(Player who, HashMap<Player, MutableHero> heroes);
 }

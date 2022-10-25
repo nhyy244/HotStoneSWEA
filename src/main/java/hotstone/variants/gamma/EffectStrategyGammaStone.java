@@ -6,7 +6,7 @@ import hotstone.standard.HeroImpl;
 
 public class EffectStrategyGammaStone implements EffectStrategy {
     @Override
-    public void usePower(Player who, Game game) {
+    public void usePower(Player who, MutableGame game) {
         HeroImpl h = (HeroImpl) game.getHero(who);
         String heroPower = h.getHeroPower();
         if(heroPower.equals("Chili")){
@@ -22,7 +22,7 @@ public class EffectStrategyGammaStone implements EffectStrategy {
     }
 
     @Override
-    public void applyCardEffects(Game game, Player who, Card card) {
+    public void applyCardEffects(MutableGame game, Player who, Card card) {
 
     }
 }

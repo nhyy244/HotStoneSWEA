@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class WinnerStrategyBetaStone implements WinnerStrategy {
     @Override
-    public Player getWinner(Game game) {
+    public Player getWinner(MutableGame game) {
         Hero findusHero = game.getHero(Player.FINDUS);
         Hero peddersenHero = game.getHero(Player.PEDDERSEN);
         if(findusHero.getHealth()<=0){

@@ -6,5 +6,5 @@ import java.util.Map;
 
 public interface GenerateDeckStrategy {
 
-    void generateDeck(Player who, HashMap<Player, List<Card>> deck);
+    void generateDeck(Player who, HashMap<Player, List<MutableCard>> deck);
 }

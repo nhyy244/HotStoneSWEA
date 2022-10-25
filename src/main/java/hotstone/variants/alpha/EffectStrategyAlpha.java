@@ -1,18 +1,15 @@
 package hotstone.variants.alpha;
 
-import hotstone.framework.Card;
-import hotstone.framework.Game;
-import hotstone.framework.EffectStrategy;
-import hotstone.framework.Player;
+import hotstone.framework.*;
 
 public class EffectStrategyAlpha implements EffectStrategy {
     @Override
-    public void usePower(Player who, Game game) {
+    public void usePower(Player who, MutableGame game) {
         System.out.println("Uses cute. Does nothing");
     }
 
     @Override
-    public void applyCardEffects(Game game, Player who, Card card) {
+    public void applyCardEffects(MutableGame game, Player who, Card card) {
 
     }
 }

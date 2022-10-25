@@ -1,9 +1,6 @@
 package hotstone.variants.zeta;
 
-import hotstone.framework.Card;
-import hotstone.framework.Game;
-import hotstone.framework.Player;
-import hotstone.framework.WinnerStrategy;
+import hotstone.framework.*;
 import hotstone.standard.StandardHotStoneGame;
 
 import java.util.HashMap;
@@ -25,7 +22,7 @@ public class AlternatingWinnerStrategyZeta implements WinnerStrategy{
     }
 
     @Override
-    public Player getWinner(Game game) {
+    public Player getWinner(MutableGame game) {
         if(game.getTurnNumber()<=6){
             this.currentState=betaWinnerStrategy;
         }

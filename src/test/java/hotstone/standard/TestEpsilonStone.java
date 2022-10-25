@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TestEpsilonStone {
 
-    private Game game;
+    private MutableGame game;
 
     @BeforeEach
     public void setUp(){
@@ -47,14 +47,14 @@ public class TestEpsilonStone {
     public void findusHeroPowerShouldReduceMinionAttackBy2(){
         CardImpl c =new CardImpl(GameConstants.TRES_CARD, 3, 3, 3, false, Player.PEDDERSEN);
         EffectStrategy fixedHeroPower = new FixedEffectStrategyTest(c);
-        fixedHeroPower.usePower(Player.FINDUS,game);
+        fixedHeroPower.usePower(Player.FINDUS, (MutableGame) game);
         assertThat(c.getAttack(),is(1));
     }
     @Test
     public void peddersenHeroPowerShouldIncreaseOwnMinionAttackBy2(){
         CardImpl c =new CardImpl(GameConstants.TRES_CARD, 3, 3, 3, false, Player.PEDDERSEN);
         EffectStrategy fixedHeroPower = new FixedEffectStrategyTest(c);
-        fixedHeroPower.usePower(Player.PEDDERSEN,game);
+        fixedHeroPower.usePower(Player.PEDDERSEN, (MutableGame) game);
         assertThat(c.getAttack(),is(5));
     }
     @Test

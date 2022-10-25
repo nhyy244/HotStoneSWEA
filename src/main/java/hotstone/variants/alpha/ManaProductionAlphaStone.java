@@ -1,13 +1,12 @@
 package hotstone.variants.alpha;
 
-import hotstone.framework.Game;
-import hotstone.framework.ManaProductionStrategy;
-import hotstone.framework.Player;
+import hotstone.framework.*;
 import hotstone.standard.HeroImpl;
 
 public class ManaProductionAlphaStone implements ManaProductionStrategy {
     @Override
-    public void manaProduction(Player who, Game game) {
-        ((HeroImpl)game.getHero(who)).setMana(3);
+    public void manaProduction(Player who, MutableGame game) {
+        //((MutableHero)game.getHero(who)).setMana(3);
+        game.deltaHeroMana(who,3);
     }
 }

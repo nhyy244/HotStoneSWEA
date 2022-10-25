@@ -53,7 +53,7 @@ public class TestDeltaStone {
     }
     @Test
     public void shouldBe24CardsInDeckFindus(){ //Unit test with help of Strategy Pattern
-        HashMap<Player,List<Card>> deckFindus = new HashMap<>();
+        HashMap<Player,List<MutableCard>> deckFindus = new HashMap<>();
         GenerateDeckStrategy generateDeckStrategyGamma = new GenerateDeckDelta();
         generateDeckStrategyGamma.generateDeck(Player.FINDUS,deckFindus);
         int deckSizeFindus = deckFindus.get(Player.FINDUS).size();
@@ -62,7 +62,7 @@ public class TestDeltaStone {
 
     @Test
     public void shouldBe24CardsInDeckPeddersen(){// Unit test with help of Strategy Pattern
-        HashMap<Player,List<Card>> deckPeddersen = new HashMap<>();
+        HashMap<Player,List<MutableCard>> deckPeddersen = new HashMap<>();
         GenerateDeckStrategy generateDeckStrategyGamma = new GenerateDeckDelta();
         generateDeckStrategyGamma.generateDeck(Player.PEDDERSEN,deckPeddersen);
         int deckSizePeddersen = deckPeddersen.get(Player.PEDDERSEN).size();
@@ -110,7 +110,7 @@ public class TestDeltaStone {
     @Test
     public void brownRiceShouldHave112(){ //unit test
         GenerateDeckStrategy deckStrategy = new GenerateDeckDelta();
-        HashMap<Player,List<Card>> s = new HashMap<>();
+        HashMap<Player,List<MutableCard>> s = new HashMap<>();
         deckStrategy.generateDeck(Player.FINDUS,s);
         verfiyCardSpecs(s.get(Player.FINDUS),GameConstants.BROWN_RICE_CARD,1,1,2);
     }
@@ -118,7 +118,7 @@ public class TestDeltaStone {
     @Test
     public void frenchFriesShouldHave121(){
         GenerateDeckStrategy deckStrategy = new GenerateDeckDelta();
-        HashMap<Player,List<Card>> s = new HashMap<>();
+        HashMap<Player,List<MutableCard>> s = new HashMap<>();
         deckStrategy.generateDeck(Player.FINDUS,s);
         verfiyCardSpecs(s.get(Player.FINDUS),GameConstants.FRENCH_FRIES_CARD,1,2,1);
     }
@@ -126,7 +126,7 @@ public class TestDeltaStone {
     @Test
     public void greenSaladCardShouldHave223(){
         GenerateDeckStrategy deckStrategy = new GenerateDeckDelta();
-        HashMap<Player,List<Card>> s = new HashMap<>();
+        HashMap<Player,List<MutableCard>> s = new HashMap<>();
         deckStrategy.generateDeck(Player.FINDUS,s);
         verfiyCardSpecs(s.get(Player.FINDUS),GameConstants.GREEN_SALAD_CARD,2,2,3);
     }
@@ -136,7 +136,7 @@ public class TestDeltaStone {
      * .
      * osv.
     **/
-    private void verfiyCardSpecs(List<? extends Card> dishDeck, String cardName, int cost, int attack, int health) {
+    private void verfiyCardSpecs(List<? extends MutableCard> dishDeck, String cardName, int cost, int attack, int health) {
         Card thecard = dishDeck.stream().filter(card -> card.getName().equals(cardName)).findFirst().orElse(null);
         assertThat(thecard.getManaCost(), is(cost));
         assertThat(thecard.getAttack(), is(attack));

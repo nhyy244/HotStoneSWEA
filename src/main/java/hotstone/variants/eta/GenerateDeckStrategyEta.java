@@ -2,6 +2,7 @@ package hotstone.variants.eta;
 
 import hotstone.framework.Card;
 import hotstone.framework.GenerateDeckStrategy;
+import hotstone.framework.MutableCard;
 import hotstone.framework.Player;
 import hotstone.standard.CardImpl;
 import hotstone.standard.GameConstants;
@@ -10,9 +11,9 @@ import java.util.*;
 
 public class GenerateDeckStrategyEta implements GenerateDeckStrategy {
     @Override
-    public void generateDeck(Player who, HashMap<Player, List<Card>> deck) {
-        ArrayList<Card> Deck1 = new ArrayList<>();
-        ArrayList<Card> deck2 = new ArrayList<>();
+    public void generateDeck(Player who, HashMap<Player, List<MutableCard>> deck) {
+        ArrayList<MutableCard> Deck1 = new ArrayList<>();
+        ArrayList<MutableCard> deck2 = new ArrayList<>();
 
         for(int i=0; i<2;i++) {
             Deck1.add(new CardImpl(GameConstants.BROWN_RICE_CARD, 1, 1, 2, false, who));
@@ -31,7 +32,7 @@ public class GenerateDeckStrategyEta implements GenerateDeckStrategy {
         Collections.shuffle(Deck1);
 
         for(int i = 1; i <= 4; i=i*2) {
-            for (Card c: Deck1) {
+            for (MutableCard c: Deck1) {
                 if (c.getManaCost() <= i) {
                     deck2.add(c);
                     Deck1.remove(c);

@@ -1,9 +1,10 @@
 package hotstone.standard;
 
 import hotstone.framework.Card;
+import hotstone.framework.MutableCard;
 import hotstone.framework.Player;
 
-public class CardImpl implements Card {
+public class CardImpl implements Card,MutableCard {
     private String name;
     private int manaCost;
     private int health;
@@ -43,28 +44,28 @@ public class CardImpl implements Card {
     public boolean isActive() {
         return active;
     }
-    public void setActive(boolean isActive){
-        this.active=isActive;
-    }
-
     @Override
     public Player getOwner() {
         return owner;
     }
 
-    public void setOwner(Player owner){
-        this.owner = owner;
+    @Override
+    public void setActive(boolean active) {
+        this.active=active;
     }
 
-    public void setHealth(int health){
+    @Override
+    public void setAttack(int attack) {
+        this.attack=attack;
+    }
+
+    @Override
+    public void setHealth(int health) {
         this.health=health;
     }
 
-    public void setMana(int manaCost){
-        this.manaCost=manaCost;
-    }
-
-    public void setAttack(int attack){
-        this.attack=attack;
+    @Override
+    public void setMana(int mana) {
+        this.manaCost=mana;
     }
 }

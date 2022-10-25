@@ -2,11 +2,12 @@ package hotstone.standard;
 
 import hotstone.framework.Card;
 import hotstone.framework.Hero;
+import hotstone.framework.MutableHero;
 import hotstone.framework.Player;
 
 import java.util.ArrayList;
 
-public class HeroImpl implements Hero {
+public class HeroImpl implements Hero, MutableHero {
     private int mana;
     private int health;
     private String type;
@@ -53,16 +54,22 @@ public class HeroImpl implements Hero {
         return owner;
     }
 
+    @Override
     public void setMana(int mana) {
-        this.mana = mana;
+        this.mana=mana;
     }
+
+    @Override
     public void setHealth(int health) {
-        this.health = health;
+        this.health=health;
     }
-    public void setActive(boolean active){
+
+    @Override
+    public void setActive(boolean active) {
         this.active=active;
     }
 
+    @Override
     public String getHeroPower() {
         return heroPower;
     }

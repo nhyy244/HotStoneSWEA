@@ -1,6 +1,5 @@
 package hotstone.standard;
 
-import hotstone.TestStubs.GameDouble;
 import hotstone.framework.Game;
 import hotstone.framework.Player;
 import hotstone.utility.TestHelper;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import hotstone.framework.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,13 +24,13 @@ public class TestZetaStone {
     @BeforeEach
     public void setUp(){
         game = new StandardHotStoneGame(new ZetaStoneFactory());
-        gameDouble = new GameDouble(new ZetaStoneFactory());
+        //gameDouble = new GameDouble(new ZetaStoneFactory());
     }
 
     @Test
     public void deckSizeFindusShouldBe7(){
         HotStoneFactory zetaStoneFactory = new ZetaStoneFactory();
-        HashMap<Player, List<Card>> deckFindus = new HashMap<>();
+        HashMap<Player, List<MutableCard>> deckFindus = new HashMap<>();
         zetaStoneFactory.createGenerateDeckStrategy().generateDeck(Player.FINDUS,deckFindus);
         int deckSizeFindus = deckFindus.get(Player.FINDUS).size();
         assertThat(deckSizeFindus,is(7));
@@ -40,7 +38,7 @@ public class TestZetaStone {
     @Test
     public void deckSizePeddersenShouldBe7(){
         HotStoneFactory zetaStoneFactory = new ZetaStoneFactory();
-        HashMap<Player, List<Card>> deckPeddersen = new HashMap<>();
+        HashMap<Player, List<MutableCard>> deckPeddersen = new HashMap<>();
         zetaStoneFactory.createGenerateDeckStrategy().generateDeck(Player.PEDDERSEN,deckPeddersen);
         int deckSizeFindus = deckPeddersen.get(Player.PEDDERSEN).size();
         assertThat(deckSizeFindus,is(7));
@@ -48,20 +46,18 @@ public class TestZetaStone {
     @Test
     public void allCardsInFindusDeckShouldBeCinco(){
         HotStoneFactory zetaStoneFactory = new ZetaStoneFactory();
-        HashMap<Player, List<Card>> deckFindusMap = new HashMap<>();
+        HashMap<Player, List<MutableCard>> deckFindusMap = new HashMap<>();
         zetaStoneFactory.createGenerateDeckStrategy().generateDeck(Player.FINDUS,deckFindusMap);
-        ArrayList<Card> deckFindus = (ArrayList<Card>) deckFindusMap.get(Player.FINDUS);
-        for(Card c : deckFindus){
+        for(Card c : deckFindusMap.get(Player.FINDUS)){
             assertThat(c.getName(),is(GameConstants.CINCO_CARD));
         }
     }
     @Test
     public void allCardsInPeddersenDeckShouldBeCinco(){
         HotStoneFactory zetaStoneFactory = new ZetaStoneFactory();
-        HashMap<Player, List<Card>> deckPeddersenMap = new HashMap<>();
+        HashMap<Player, List<MutableCard>> deckPeddersenMap = new HashMap<>();
         zetaStoneFactory.createGenerateDeckStrategy().generateDeck(Player.PEDDERSEN,deckPeddersenMap);
-        ArrayList<Card> deckPeddersen = (ArrayList<Card>) deckPeddersenMap.get(Player.PEDDERSEN);
-        for(Card c : deckPeddersen){
+        for(Card c : deckPeddersenMap.get(Player.PEDDERSEN)){
             assertThat(c.getName(),is(GameConstants.CINCO_CARD));
         }
     }
