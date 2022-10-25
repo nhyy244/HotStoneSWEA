@@ -7,11 +7,11 @@ import hotstone.standard.HeroImpl;
 public class EffectStrategyGammaStone implements EffectStrategy {
     @Override
     public void usePower(Player who, MutableGame game) {
-        HeroImpl h = (HeroImpl) game.getHero(who);
+        MutableHero h = (MutableHero)game.getHero(who);
         String heroPower = h.getHeroPower();
         if(heroPower.equals("Chili")){
-            ((HeroImpl)game.getHero(Utility.computeOpponent(who))).
-                    setHealth((game.getHero(Utility.computeOpponent(who)).getHealth()-2));
+            MutableHero opponentHero = (MutableHero) game.getHero(Utility.computeOpponent(who));
+            game.deltaHeroHealth(opponentHero.getOwner(),opponentHero.getHealth()-2);
             System.out.println("Opp H: (0,-2)");
         }
         if(heroPower.equals("Sovs")){

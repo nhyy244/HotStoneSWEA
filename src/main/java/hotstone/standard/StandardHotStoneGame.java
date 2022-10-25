@@ -18,6 +18,8 @@
 package hotstone.standard;
 
 import hotstone.framework.*;
+import hotstone.observer.GameObserver;
+import hotstone.observer.ObserverHandler;
 import hotstone.variants.factory.HotStoneFactory;
 import hotstone.variants.factory.ZetaStoneFactory;
 
@@ -63,6 +65,9 @@ public class StandardHotStoneGame implements Game,MutableGame {
   private int turnNumber;
   private int roundNumber;
   private HotStoneFactory hotStoneFactory;
+
+  private ArrayList<GameObserver> observers = new ArrayList<>();
+  private ObserverHandler observerHandler = new ObserverHandler();
 
 
   public StandardHotStoneGame(HotStoneFactory hotStoneFactory){
@@ -151,7 +156,10 @@ public class StandardHotStoneGame implements Game,MutableGame {
 
   @Override
   public Player getWinner() {
-    return winnerStrategy.getWinner(this);
+    Player winner = winnerStrategy.getWinner(this);
+
+    observerHandler.notifyGameWon(winner);
+    return winner;
     //return null;
   }
 
@@ -209,6 +217,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
     hero.setActive(true);
     drawCardFromDeck(currentPlayerInTurn);
     setMinionOnFieldActive();
+    observerHandler.notifyTurnChangeTo(currentPlayerInTurn);
   }
   /*public void drawCard(MutableHero h, List<? extends MutableCard> d ){
     if(d.isEmpty()){
@@ -249,6 +258,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
     //field.get(who).add(0, (MutableCard) card); //updates field when card is played
     effectStrategy.applyCardEffects(this,who,card);
     hand.get(who).remove(card);
+    observerHandler.notifyPlayCard(who,card);
 
     return Status.OK;
   }
@@ -275,6 +285,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
     deltaCardHealth(defendingCard,(defendingCard.getHealth()-attackingCard.getAttack()));
 
     checkMinionsFor0Health(playerAttacking,attackingCard,defendingCard);
+    observerHandler.notifyAttackCard(playerAttacking,attackingCard,defendingCard);
 
     return Status.OK;
   }
@@ -313,6 +324,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
     opponentHero.setHealth(opponentHeroHealthAfterAttacked);
     //((CardImpl)attackingCard).setActive(false);
     setCardActiveState(attackingCard,false);
+    observerHandler.notifyAttackHero(playerAttacking,attackingCard);
 
    return Status.OK;
 
@@ -337,6 +349,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
     effectStrategy.usePower(who,this);
     //((HeroImpl) getHero(who)).setActive(false);
     setHeroActiveState(who,false);
+    observerHandler.notifyUsePower(who);
 
     //((HeroImpl))getHero(who).
     return Status.OK;
@@ -345,35 +358,45 @@ public class StandardHotStoneGame implements Game,MutableGame {
   @Override
   public void setHeroActiveState(Player who, boolean isActive) {
     ((MutableHero)getHero(who)).setActive(isActive);
+    observerHandler.notifyHeroUpdate(who);
   }
 
   @Override
   public void setCardActiveState(Card card, boolean isActive) {
     ((MutableCard)card).setActive(isActive);
+    observerHandler.notifyCardUpdate(card);
   }
 
   @Override
   public void deltaCardHealth(Card card, int value) {
     ((MutableCard)card).setHealth(value);
+    observerHandler.notifyCardUpdate(card);
+
   }
 
   @Override
   public void deltaHeroMana(Player who, int manaValue) {
-    ((MutableHero)getHero(who)).setMana(manaValue);
+    MutableHero playerHero = (MutableHero) getHero(who);
+    playerHero.setMana(manaValue);
+    observerHandler.notifyHeroUpdate(who);
   }
 
   @Override
   public void deltaHeroHealth(Player who, int healthValue) {
-    ((MutableHero)getHero(who)).setHealth(healthValue);
+    MutableHero playerHero = (MutableHero) getHero(who);
+    playerHero.setHealth(healthValue);
+    observerHandler.notifyHeroUpdate(who);
   }
 
   @Override
   public void drawCardFromDeck(Player who) {
     if(deck.get(who).isEmpty()){
       ((MutableHero)getHero(who)).setHealth(getHero(who).getHealth()-2);
+      observerHandler.notifyHeroUpdate(who);
     }
     else{
       hand.get(currentPlayerInTurn).add(0, deck.get(who).get(0)); //adds card from deck to the hand.
+      observerHandler.notifyCardDraw(who,deck.get(who).get(0));
       deck.get(who).remove(0);
     }
   }
@@ -386,17 +409,30 @@ public class StandardHotStoneGame implements Game,MutableGame {
   @Override
   public void deltaFieldCardHealth(Player who, int fieldIndex, int delta) {
     MutableCard c = ((MutableCard)getCardInField(who,fieldIndex)); //best to make getMutableCardInField in MutableCard
-    c.setHealth(c.getAttack()+delta);
+    c.setHealth(delta);
+    observerHandler.notifyCardUpdate(c);
   }
 
   @Override
   public void deltaFieldCardAttack(Player who, int fieldIndex, int delta) {
     MutableCard c = ((MutableCard)getCardInField(who,fieldIndex));
-    c.setAttack(c.getAttack()+delta);
+    c.setAttack(delta);
+    observerHandler.notifyCardUpdate(c);
   }
 
   @Override
   public void removeCardFromField(Player who, Card card) {
     field.get(who).remove(card);
+    observerHandler.notifyCardRemove(who,card);
+  }
+
+  @Override
+  public ArrayList<MutableCard> getFieldArray(Player who) {
+    return (ArrayList<MutableCard>) field.get(who);
+  }
+
+  @Override
+  public void addObserver(GameObserver observer) {
+    observerHandler.addObserver(observer);
   }
 }

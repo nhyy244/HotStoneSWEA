@@ -1,5 +1,7 @@
 package hotstone.framework;
 
+import java.util.ArrayList;
+
 public interface MutableGame extends Game{
     // === Private Interface for internal mutable state
     void setHeroActiveState(Player who, boolean isActive);
@@ -13,4 +15,6 @@ public interface MutableGame extends Game{
     // PRECONDITION: The health will not drop below 0, if it does use removeCardFromField!
     void deltaFieldCardAttack(Player who, int fieldIndex, int delta);
     void removeCardFromField(Player who, Card card);
+
+    ArrayList<MutableCard> getFieldArray(Player who);
 }

@@ -11,7 +11,7 @@ public class EffectStrategyEpsilon implements EffectStrategy {
     @Override
     public void usePower(Player who, MutableGame game) {
         Random r = new Random();
-        HeroImpl h = (HeroImpl) game.getHero(who);
+        MutableHero h = (MutableHero) game.getHero(who);
         String heroPower = h.getHeroPower();
         Hero opponentHero = game.getHero(Utility.computeOpponent(who));
 

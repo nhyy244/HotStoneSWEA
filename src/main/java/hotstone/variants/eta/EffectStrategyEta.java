@@ -24,7 +24,8 @@ public class EffectStrategyEta implements EffectStrategy {
         Random r = new Random();
         switch (card.getName()){
             case GameConstants.BROWN_RICE_CARD:
-                opponentHero.setHealth(opponentHero.getHealth()-1); //do one damage to opponentHero
+                game.deltaHeroHealth(opponentHero.getOwner(),opponentHero.getHealth()-1);
+                //opponentHero.setHealth(opponentHero.getHealth()-1); //do one damage to opponentHero
                 System.out.println("Opp H: (0,-1)");
             break;
             case GameConstants.TOMATO_SALAD_CARD:
@@ -32,13 +33,17 @@ public class EffectStrategyEta implements EffectStrategy {
                     for(int i=1;i<game.getFieldSize(who);i++){
                         cardsToBeBuffed.add(game.getCardInField(who,i));
                     }
-                    CardImpl cardToBeBuffed = (CardImpl) cardsToBeBuffed.get(r.nextInt(cardsToBeBuffed.size()));
-                    cardToBeBuffed.setAttack(cardToBeBuffed.getAttack() + 1);
+                    int randomIndex = r.nextInt(cardsToBeBuffed.size());
+                    MutableCard cardToBeBuffed = (MutableCard) cardsToBeBuffed.get(randomIndex);
+                    int indexOnField = game.getFieldArray(cardToBeBuffed.getOwner()).indexOf(cardToBeBuffed);
+                    game.deltaFieldCardAttack(cardToBeBuffed.getOwner(),indexOnField,cardToBeBuffed.getAttack()+1);
+                    //cardToBeBuffed.setAttack(cardToBeBuffed.getAttack() + 1);
                     System.out.println("M: (+1,0)");
                 }
             break;
             case GameConstants.POKE_BOWL_CARD:
-                playerInTurnHero.setHealth(playerInTurnHero.getHealth()+2);
+                game.deltaHeroHealth(playerInTurnHero.getOwner(), playerInTurnHero.getHealth()+2);
+                //playerInTurnHero.setHealth(playerInTurnHero.getHealth()+2);
                 System.out.println("H: (0,+2)");
             break;
 
@@ -49,17 +54,21 @@ public class EffectStrategyEta implements EffectStrategy {
             break;
             case GameConstants.CHICKEN_CURRY_CARD:
                 if(game.getField(opponentHero.getOwner()) != null){
-                    CardImpl cardToBeKilled = (CardImpl)game.getCardInField(Utility.computeOpponent(who), r.nextInt(game.getFieldSize(who)));
-                        ((StandardHotStoneGame)game).getFieldList(opponentHero.getOwner()).remove(cardToBeKilled);
+                    MutableCard cardToBeKilled = (MutableCard)game.getCardInField(Utility.computeOpponent(who), r.nextInt(game.getFieldSize(who)));
+                        //((StandardHotStoneGame)game).getFieldList(opponentHero.getOwner()).remove(cardToBeKilled);
+                        game.removeCardFromField(opponentHero.getOwner(),cardToBeKilled);
                         System.out.println("Kill opp M ");
 
             }
             break;
             case GameConstants.BEEF_BURGER_CARD:
                 if(game.getField(opponentHero.getOwner()) != null){
-                    CardImpl cardToBeBuffed2= (CardImpl)game.getCardInField(opponentHero.getOwner(), r.nextInt(game.getFieldSize(who)));
-                        cardToBeBuffed2.setAttack(cardToBeBuffed2.getAttack()+2);
-                        System.out.println("Kill opp M ");
+                    int randomIndex = r.nextInt(game.getFieldSize(who));
+                    MutableCard cardToBeBuffed2= (MutableCard)game.getCardInField(opponentHero.getOwner(), randomIndex);
+                        //cardToBeBuffed2.setAttack(cardToBeBuffed2.getAttack()+2);
+                    int indexOnField = game.getFieldArray(cardToBeBuffed2.getOwner()).indexOf(cardToBeBuffed2);
+                    game.deltaFieldCardAttack(cardToBeBuffed2.getOwner(),indexOnField,cardToBeBuffed2.getAttack()+2);
+                    System.out.println("Kill opp M ");
                     }
             break;
         }
