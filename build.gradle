@@ -23,6 +23,9 @@ plugins {
 
 repositories {
     // Tell where to get libraries: from 'mvnrepository.com'
+    maven {
+        url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+    }
     mavenCentral()
 }
 
@@ -35,6 +38,9 @@ dependencies {
     // Use the Hamcrest matcher library
     testImplementation group: 'org.hamcrest',
             name: 'hamcrest-library', version: '2.2'
+
+    implementation 'com.baerbak.maven:hotstone-deck:1.0-SNAPSHOT'
+
 }
 
 test {
@@ -51,3 +57,4 @@ wrapper {
 jacoco {
   toolVersion = "0.8.8"
 }
+
