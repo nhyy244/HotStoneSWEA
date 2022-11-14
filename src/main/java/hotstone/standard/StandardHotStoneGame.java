@@ -66,7 +66,6 @@ public class StandardHotStoneGame implements Game,MutableGame {
   private int roundNumber;
   private HotStoneFactory hotStoneFactory;
 
-  private ArrayList<GameObserver> observers = new ArrayList<>();
   private ObserverHandler observerHandler = new ObserverHandler();
 
 
@@ -211,13 +210,15 @@ public class StandardHotStoneGame implements Game,MutableGame {
     if(turnNumber % 2 == 0){ //computes roundNumber 2TurnNumber=1roundNumber
       roundNumber++;
     }
+    observerHandler.notifyTurnChangeTo(currentPlayerInTurn);
     MutableHero hero = heroes.get(currentPlayerInTurn);
     manaProductionStrategy.manaProduction(currentPlayerInTurn,this);
+    observerHandler.notifyHeroUpdate(hero.getOwner());
 
     hero.setActive(true);
+    observerHandler.notifyHeroUpdate(hero.getOwner());
     drawCardFromDeck(currentPlayerInTurn);
     setMinionOnFieldActive();
-    observerHandler.notifyTurnChangeTo(currentPlayerInTurn);
   }
   /*public void drawCard(MutableHero h, List<? extends MutableCard> d ){
     if(d.isEmpty()){
@@ -234,6 +235,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
       for (MutableCard c : field.get(currentPlayerInTurn)) {
         if (!(c.isActive())) {
           setCardActiveState(c,true);
+          observerHandler.notifyCardUpdate(c);
         }
       }
     }
@@ -255,9 +257,10 @@ public class StandardHotStoneGame implements Game,MutableGame {
     deltaHeroMana(who,h.getMana()- card.getManaCost());
     //h.setMana(h.getMana()- card.getManaCost()); //updates mana  when card is played
     addCardToField(who,card);
+    hand.get(who).remove(card);
     //field.get(who).add(0, (MutableCard) card); //updates field when card is played
     effectStrategy.applyCardEffects(this,who,card);
-    hand.get(who).remove(card);
+    observerHandler.notifyCardUpdate(card);
     observerHandler.notifyPlayCard(who,card);
 
     return Status.OK;
@@ -324,6 +327,8 @@ public class StandardHotStoneGame implements Game,MutableGame {
     opponentHero.setHealth(opponentHeroHealthAfterAttacked);
     //((CardImpl)attackingCard).setActive(false);
     setCardActiveState(attackingCard,false);
+    observerHandler.notifyCardUpdate(attackingCard);
+    observerHandler.notifyHeroUpdate(opponentPlayer);
     observerHandler.notifyAttackHero(playerAttacking,attackingCard);
 
    return Status.OK;

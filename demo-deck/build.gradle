@@ -1,0 +1,32 @@
+/*
+ * Demonstration of the hotstone-deck library.
+ *
+ * Run 'gradle demo' to see a deck being generated.
+ *
+ * Henrik Bærbak Christensen
+ */
+
+plugins {
+  id 'java'
+}
+
+// The deck library is not an official library, so I have put it
+// in a SNAPSHOT repository that needs the full URL to pull.
+repositories {
+  maven {
+    url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+  }
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'com.baerbak.maven:hotstone-deck:1.0-SNAPSHOT'
+}
+
+task demo(type: JavaExec) {
+  group 'Demo'
+  description 'Demonstration of the HotStone Personal Deck generator'
+
+  classpath sourceSets.test.runtimeClasspath
+  main = 'demo.DemoDeck'
+}
