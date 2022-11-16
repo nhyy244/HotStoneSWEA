@@ -92,10 +92,10 @@ public class MinionAttackTool extends NullTool {
                     Card defendingCard = defendingActorCard.getAssociatedCard();
                     Status status = game.attackCard(whoAmIPlaying, attackingCard, defendingCard);
                     editor.showStatus("Attack Card on Minion. Result =" + status);
+
                 }
                 if (defendingActor.getType() == HotStoneFigureType.HERO_FIGURE) {
                     Status status = game.attackHero(whoAmIPlaying, attackingCard);
-
                     editor.showStatus("Attack Card on Hero. Result =" + status);
                 }
             }

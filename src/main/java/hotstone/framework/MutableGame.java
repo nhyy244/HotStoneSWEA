@@ -1,5 +1,7 @@
 package hotstone.framework;
 
+import hotstone.observer.ObserverHandler;
+
 import java.util.ArrayList;
 
 public interface MutableGame extends Game{
@@ -17,4 +19,6 @@ public interface MutableGame extends Game{
     void removeCardFromField(Player who, Card card);
 
     ArrayList<MutableCard> getFieldArray(Player who);
+
+    ObserverHandler getObserverHandler();
 }

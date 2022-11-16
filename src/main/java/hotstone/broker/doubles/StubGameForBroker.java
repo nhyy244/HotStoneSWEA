@@ -20,12 +20,15 @@ package hotstone.broker.doubles;
 import frds.broker.Servant;
 import hotstone.framework.*;
 import hotstone.observer.GameObserver;
+import hotstone.standard.HeroImpl;
 
 /** A Test Stub for game, to make easily recognizable output
  * to assert on in the Broker test cases. Some methods have
  * already been defined.
  */
 public class StubGameForBroker implements Game, Servant {
+
+  private String lastMethodCalled = "";
   @Override
   public int getTurnNumber() {
     return 312;
@@ -83,7 +86,7 @@ public class StubGameForBroker implements Game, Servant {
 
   @Override
   public void endTurn() {
-
+    lastMethodCalled = "endTurn";
   }
 
   @Override
@@ -103,11 +106,15 @@ public class StubGameForBroker implements Game, Servant {
 
   @Override
   public Status usePower(Player who) {
-    return null;
+    //lastMethodCalled = "usePower";
+    return Status.OK;
   }
 
   @Override
   public void addObserver(GameObserver observer) {
 
+  }
+  public String getLastMethodCalled(){
+    return lastMethodCalled;
   }
 }

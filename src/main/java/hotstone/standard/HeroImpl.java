@@ -17,7 +17,7 @@ public class HeroImpl implements Hero, MutableHero {
 
 
     public HeroImpl(String type, Player owner,String heroPower) {
-        this.health = GameConstants.HERO_MAX_HEALTH;
+        this.health = 1;
         this.type = type;
         this.owner = owner;
         //this.mana=0;

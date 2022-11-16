@@ -24,6 +24,7 @@ import frds.broker.marshall.json.StandardJSONRequestor;
 import hotstone.broker.client.GameClientProxy;
 import hotstone.broker.common.BrokerConstants;
 import hotstone.framework.Game;
+import hotstone.framework.Player;
 
 public class HotStoneStoryTest {
   public static void main(String[] args)  {
@@ -48,6 +49,10 @@ public class HotStoneStoryTest {
     System.out.println("=== Testing pass-by-value methods of Game ===");
     System.out.println(" --> Game turnNumber     " + game.getTurnNumber());
     System.out.println(" --> Game winner         " + game.getWinner());
+    System.out.println(" --> Findus uses Power        " + game.usePower(Player.FINDUS));
+    System.out.println(" --> Findus' Hero  " + game.getHero(Player.FINDUS));
+
+
     // TODO - add calls to the rest of the implemented methods
     System.out.println("=== End ===");
   }

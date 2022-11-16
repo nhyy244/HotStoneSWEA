@@ -10,13 +10,20 @@ public class WinnerStrategyBetaStone implements WinnerStrategy {
     public Player getWinner(MutableGame game) {
         Hero findusHero = game.getHero(Player.FINDUS);
         Hero peddersenHero = game.getHero(Player.PEDDERSEN);
+        Player winner = null;
+        System.out.println("hello");
         if(findusHero.getHealth()<=0){
-            return Player.PEDDERSEN;
+            //game.getObserverHandler().notifyGameWon(Player.PEDDERSEN);
+            winner = Player.PEDDERSEN;
+            System.out.println("hello2");
         }
-        if(peddersenHero.getHealth()<=0){
-            return Player.FINDUS;
+        else if(peddersenHero.getHealth()<=0){
+            //game.getObserverHandler().notifyGameWon(Player.FINDUS);
+            winner = Player.FINDUS;
+            System.out.println("hello3");
         }
-        return null;
+        //Player winner = game.getPlayerInTurn() ? game.getHero(game.getPlayerInTurn()).getHealth()<=0 : null;
+        return winner;
     }
 
     @Override

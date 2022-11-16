@@ -14,7 +14,8 @@ public class EpsilonWinnerStrategy implements WinnerStrategy {
     @Override
     public Player getWinner(MutableGame game) {
         if(((StandardHotStoneGame)game).getTotalAttackOutput(game.getPlayerInTurn()) >=7){
-          return game.getPlayerInTurn();
+            game.getObserverHandler().notifyGameWon(game.getPlayerInTurn());
+            return game.getPlayerInTurn();
         }
       return null;
     }

@@ -19,23 +19,29 @@ package hotstone.broker.client;
 
 import frds.broker.ClientProxy;
 import frds.broker.Requestor;
+import hotstone.broker.common.OperationNames;
 import hotstone.framework.*;
 import hotstone.observer.GameObserver;
+import hotstone.standard.StandardHotStoneGame;
 
 /** Template/starter code for your ClientProxy of Game.
  */
 public class GameClientProxy implements Game, ClientProxy {
+
+  private final static String GAME_OBJECTID="singleton";
+  private final Requestor requestor;
   public GameClientProxy(Requestor requestor) {
+    this.requestor=requestor;
   }
 
   @Override
   public int getTurnNumber() {
-    return 0;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_TURN_NUMBER,Integer.class);
   }
 
   @Override
   public Player getPlayerInTurn() {
-    return null;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_PLAYER_IN_TURN,Player.class);
   }
 
   @Override
@@ -45,12 +51,12 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public Player getWinner() {
-    return null;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_WINNER,Player.class);
   }
 
   @Override
   public int getDeckSize(Player who) {
-    return 0;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_DECK_SIZE,Integer.class,who);
   }
 
   @Override
@@ -65,7 +71,7 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public int getHandSize(Player who) {
-    return 0;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_HAND_SIZE,Integer.class,who);
   }
 
   @Override
@@ -80,12 +86,12 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public int getFieldSize(Player who) {
-    return 0;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_FIELD_SIZE,Integer.class,who);
   }
 
   @Override
   public void endTurn() {
-
+    requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_END_OF_TURN,null);
   }
 
   @Override
@@ -105,7 +111,7 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public Status usePower(Player who) {
-    return null;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_USE_POWER,Status.class,who);
   }
 
   @Override

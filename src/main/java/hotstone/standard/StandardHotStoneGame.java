@@ -157,7 +157,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
   public Player getWinner() {
     Player winner = winnerStrategy.getWinner(this);
 
-    observerHandler.notifyGameWon(winner);
+    //observerHandler.notifyGameWon(winner);
     return winner;
     //return null;
   }
@@ -289,6 +289,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
 
     checkMinionsFor0Health(playerAttacking,attackingCard,defendingCard);
     observerHandler.notifyAttackCard(playerAttacking,attackingCard,defendingCard);
+    observerHandler.notifyGameWon(playerAttacking);
 
     return Status.OK;
   }
@@ -330,8 +331,9 @@ public class StandardHotStoneGame implements Game,MutableGame {
     observerHandler.notifyCardUpdate(attackingCard);
     observerHandler.notifyHeroUpdate(opponentPlayer);
     observerHandler.notifyAttackHero(playerAttacking,attackingCard);
+    observerHandler.notifyGameWon(playerAttacking);
 
-   return Status.OK;
+    return Status.OK;
 
   }
 
@@ -434,6 +436,11 @@ public class StandardHotStoneGame implements Game,MutableGame {
   @Override
   public ArrayList<MutableCard> getFieldArray(Player who) {
     return (ArrayList<MutableCard>) field.get(who);
+  }
+
+  @Override
+  public ObserverHandler getObserverHandler() {
+    return observerHandler;
   }
 
   @Override
