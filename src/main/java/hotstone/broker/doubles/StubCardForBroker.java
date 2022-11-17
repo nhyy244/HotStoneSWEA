@@ -33,4 +33,9 @@ public class StubCardForBroker implements Card {
     public Player getOwner() {
         return Player.FINDUS;
     }
+
+    @Override
+    public String getID() {
+        return null;
+    }
 }

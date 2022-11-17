@@ -17,6 +17,7 @@
 
 package hotstone.broker.client;
 
+import com.google.gson.reflect.TypeToken;
 import frds.broker.ClientProxy;
 import frds.broker.Requestor;
 import hotstone.broker.common.OperationNames;
@@ -24,14 +25,20 @@ import hotstone.framework.*;
 import hotstone.observer.GameObserver;
 import hotstone.standard.StandardHotStoneGame;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 /** Template/starter code for your ClientProxy of Game.
  */
 public class GameClientProxy implements Game, ClientProxy {
 
   private final static String GAME_OBJECTID="singleton";
+  //private static String objectId;
   private final Requestor requestor;
   public GameClientProxy(Requestor requestor) {
     this.requestor=requestor;
+    //this.objectId = objectId
   }
 
   @Override
@@ -46,7 +53,8 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public Hero getHero(Player who) {
-    return null;
+    String id = requestor.sendRequestAndAwaitReply("none",OperationNames.GAME_GET_HERO,String.class,who);
+    return new HeroClientProxy(requestor,id);
   }
 
   @Override
@@ -61,12 +69,20 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public Card getCardInHand(Player who, int indexInHand) {
-    return null;
+    String id = requestor.sendRequestAndAwaitReply("none",OperationNames.GAME_GET_CARD_IN_HAND,String.class,who,indexInHand);
+    return new CardClientProxy(requestor,id);
   }
 
   @Override
   public Iterable<? extends Card> getHand(Player who) {
-    return null;
+    List<CardClientProxy> cardClientProxyList = new ArrayList<>();
+    Type collectionType = new TypeToken<List<String>>(){}.getType();
+    List<String> theIDList = requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_HAND,collectionType,who);
+    for(String id: theIDList){
+      CardClientProxy c = new CardClientProxy(requestor,id);
+      cardClientProxyList.add(c);
+    }
+    return cardClientProxyList;
   }
 
   @Override
@@ -76,12 +92,20 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public Card getCardInField(Player who, int indexInField) {
-    return null;
+    String id = requestor.sendRequestAndAwaitReply("none",OperationNames.GAME_GET_CARD_IN_FIELD,String.class,who,indexInField);
+    return new CardClientProxy(requestor,id);
   }
 
   @Override
   public Iterable<? extends Card> getField(Player who) {
-    return null;
+    List<CardClientProxy> cardClientProxyList = new ArrayList<>();
+    Type collectionType = new TypeToken<List<String>>(){}.getType();
+    List<String> theIDList = requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_GET_FIELD,collectionType,who);
+    for(String id: theIDList){
+      CardClientProxy c = new CardClientProxy(requestor,id);
+      cardClientProxyList.add(c);
+    }
+    return cardClientProxyList;
   }
 
   @Override
@@ -96,17 +120,17 @@ public class GameClientProxy implements Game, ClientProxy {
 
   @Override
   public Status playCard(Player who, Card card) {
-    return null;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_PLAY_CARD,Status.class,who,card.getID());
   }
 
   @Override
   public Status attackCard(Player playerAttacking, Card attackingCard, Card defendingCard) {
-    return null;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_ATTACK_CARD,Status.class,playerAttacking,attackingCard.getID(),defendingCard.getID());
   }
 
   @Override
   public Status attackHero(Player playerAttacking, Card attackingCard) {
-    return null;
+    return requestor.sendRequestAndAwaitReply(GAME_OBJECTID,OperationNames.GAME_ATTACK_HERO,Status.class,playerAttacking,attackingCard.getID());
   }
 
   @Override

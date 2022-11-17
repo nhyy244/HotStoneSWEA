@@ -6,6 +6,7 @@ import hotstone.framework.MutableHero;
 import hotstone.framework.Player;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class HeroImpl implements Hero, MutableHero {
     private int mana;
@@ -14,12 +15,13 @@ public class HeroImpl implements Hero, MutableHero {
     private Player owner;
     private String heroPower;
     private boolean active;
-
+    private String id;
 
     public HeroImpl(String type, Player owner,String heroPower) {
-        this.health = 1;
+        this.health = GameConstants.HERO_MAX_HEALTH;
         this.type = type;
         this.owner = owner;
+        id = UUID.randomUUID().toString();
         //this.mana=0;
         this.heroPower = heroPower;
         this.active=false;
@@ -72,5 +74,10 @@ public class HeroImpl implements Hero, MutableHero {
     @Override
     public String getHeroPower() {
         return heroPower;
+    }
+
+    @Override
+    public String getID() {
+        return id;
     }
 }

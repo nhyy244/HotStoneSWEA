@@ -63,4 +63,9 @@ public class StubHero implements Hero {
   public void setActive(boolean newValue) {
     active = newValue;
   }
+
+  @Override
+  public String getID() {
+    return null;
+  }
 }

@@ -347,6 +347,7 @@ public class StandardHotStoneGame implements Game,MutableGame {
       return Status.NOT_PLAYER_IN_TURN;
     }
     if (getHero(who).getMana() < 2) {
+      System.out.println("hero not enough mana " + getHero(who).getMana()+ " " + getHero(who).getOwner());
       return Status.NOT_ENOUGH_MANA;
     }
     if(!getHero(who).isActive()){

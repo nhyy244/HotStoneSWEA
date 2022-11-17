@@ -50,7 +50,6 @@ public class HotStoneStoryTest {
     System.out.println(" --> Game turnNumber     " + game.getTurnNumber());
     System.out.println(" --> Game winner         " + game.getWinner());
     System.out.println(" --> Findus uses Power        " + game.usePower(Player.FINDUS));
-    System.out.println(" --> Findus' Hero  " + game.getHero(Player.FINDUS));
 
 
     // TODO - add calls to the rest of the implemented methods

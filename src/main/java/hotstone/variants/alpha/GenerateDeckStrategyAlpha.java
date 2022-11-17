@@ -15,7 +15,7 @@ public class GenerateDeckStrategyAlpha implements GenerateDeckStrategy {
     @Override
     public void generateDeck(Player who, HashMap<Player, List<MutableCard>> deck) {
         ArrayList<MutableCard> Deck1 = new ArrayList<>();
-        Deck1.add(new CardImpl(GameConstants.UNO_CARD, 1, 1, 1, true, who));
+        Deck1.add(new CardImpl(GameConstants.UNO_CARD, 1, 1, 1, false, who));
         Deck1.add(new CardImpl(GameConstants.DOS_CARD, 2, 2, 2, false, who));
         Deck1.add(new CardImpl(GameConstants.TRES_CARD, 3, 3, 3, false, who));
         Deck1.add(new CardImpl(GameConstants.CUATRO_CARD, 2, 3, 1, false, who));

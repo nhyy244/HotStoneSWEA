@@ -28,6 +28,8 @@ import hotstone.standard.HeroImpl;
  */
 public class StubGameForBroker implements Game, Servant {
 
+  Hero h;
+
   private String lastMethodCalled = "";
   @Override
   public int getTurnNumber() {
@@ -45,7 +47,8 @@ public class StubGameForBroker implements Game, Servant {
 
   @Override
   public Hero getHero(Player who) {
-    return null;
+    h = new StubHeroForBroker();
+    return h;
   }
 
 
