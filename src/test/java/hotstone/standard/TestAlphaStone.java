@@ -32,11 +32,8 @@ package hotstone.standard;
 
 import hotstone.framework.*;
 import hotstone.utility.TestHelper;
-import hotstone.variants.*;
+import hotstone.variants.factory.AlphaStoneFactory;
 import org.junit.jupiter.api.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,8 +48,7 @@ public class TestAlphaStone {
   /** Fixture for AlphaStone testing. */
   @BeforeEach
   public void setUp() {
-    game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(),new ManaProductionAlphaStone(),new HeroGenerationStrategyAlpha(),
-            new HeroPowerStrategyAlpha(),new GenerateDeckStrategyAlpha());
+    game = new StandardHotStoneGame(new AlphaStoneFactory());
   }
 
   // The HotStone specs are quite insisting on how

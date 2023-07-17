@@ -18,10 +18,10 @@
 package hotstone.standard;
 
 import hotstone.framework.*;
-import hotstone.variants.FindusWinsAt4RoundsStrategy;
-import hotstone.variants.ManaProductionAlphaStone;
-import hotstone.variants.ManaProductionBetaStone;
-import hotstone.variants.WinnerStrategyBetaStone;
+import hotstone.observer.GameObserver;
+import hotstone.observer.ObserverHandler;
+import hotstone.variants.factory.HotStoneFactory;
+import hotstone.variants.factory.ZetaStoneFactory;
 
 import java.util.*;
 
@@ -46,38 +46,50 @@ import java.util.*;
  * enable a lot of game variants. This is also
  * why it is not called 'AlphaGame'.
  */
-public class StandardHotStoneGame implements Game {
-  private HashMap<Player, List<Card>> deck;
-  private HashMap<Player, HeroImpl> heroes;
-  private HashMap<Player, List<Card>> hand;
+public class StandardHotStoneGame implements Game,MutableGame {
+  private HashMap<Player, List<MutableCard>> deck;
+  private HashMap<Player, MutableHero> heroes;
+  private HashMap<Player, List<MutableCard>> hand;
 
-  private HashMap<Player, List<Card>> field;
+  private HashMap<Player, List<MutableCard>> field;
+  private HashMap<Player,Integer> totalAttackOutput;
+
   private Player currentPlayerInTurn;
 
   private WinnerStrategy winnerStrategy;
+
   private ManaProductionStrategy manaProductionStrategy;
   private HeroGenerationStrategy heroGenerationStrategy;
-  private HeroPowerStrategy heroPowerStrategy;
+  private EffectStrategy effectStrategy;
   private GenerateDeckStrategy generateDeckStrategy;
   private int turnNumber;
   private int roundNumber;
+  private HotStoneFactory hotStoneFactory;
+
+  private ObserverHandler observerHandler = new ObserverHandler();
 
 
-  public StandardHotStoneGame(WinnerStrategy winnerStrategy,ManaProductionStrategy manaProductionStrategy,
-                              HeroGenerationStrategy heroGenerationStrategy,HeroPowerStrategy heroPowerStrategy,
-                              GenerateDeckStrategy generateDeckStrategy){
-    this.winnerStrategy= winnerStrategy;
-    this.manaProductionStrategy=manaProductionStrategy;
-    this.heroGenerationStrategy=heroGenerationStrategy;
-    this.heroPowerStrategy=heroPowerStrategy;
-    this.generateDeckStrategy=generateDeckStrategy;
+  public StandardHotStoneGame(HotStoneFactory hotStoneFactory){
+    this.hotStoneFactory = hotStoneFactory;
 
+    this.winnerStrategy= hotStoneFactory.createWinnerStrategy();
+    this.manaProductionStrategy=hotStoneFactory.createManaProductionStrategy();
+    this.heroGenerationStrategy=hotStoneFactory.createHeroGenerationStrategy();
+    this.effectStrategy =hotStoneFactory.createEffectStrategy();
+    this.generateDeckStrategy=hotStoneFactory.createGenerateDeckStrategy();
+
+
+    generateGameStart();
+
+  }
+  private void generateGameStart(){
     currentPlayerInTurn = Player.FINDUS;
 
     deck = new HashMap<>();
     heroes = new HashMap<>();
     hand = new HashMap<>();
     field = new HashMap<>();
+    totalAttackOutput= new HashMap<>();
     generateHeroes(Player.FINDUS);
     generateHeroes(Player.PEDDERSEN);
     generateDeck(Player.FINDUS,deck);
@@ -86,14 +98,22 @@ public class StandardHotStoneGame implements Game {
     generateHand(Player.PEDDERSEN);
     generateEmptyField(Player.FINDUS);
     generateEmptyField(Player.PEDDERSEN);
+    generateEmptyAttackOutput(Player.FINDUS);
+    generateEmptyAttackOutput(Player.PEDDERSEN);
 
-    ((HeroImpl)getHero(Player.FINDUS)).setActive(true);
+
+
+
+    //((HeroImpl)getHero(Player.FINDUS)).setActive(true);
+    setHeroActiveState(Player.FINDUS,true);
     /*
-    * START MANA FOR BOTH PLAYERS ! AT ROUND START =0*/
+     * START MANA FOR BOTH PLAYERS ! AT ROUND START =0*/
     manaProductionStrategy.manaProduction(Player.FINDUS,this);
     manaProductionStrategy.manaProduction(Player.PEDDERSEN,this);
+
+
   }
-  private void generateDeck(Player who,HashMap<Player,List<Card>> deck){
+  private void generateDeck(Player who,HashMap<Player,List<MutableCard>> deck){
     generateDeckStrategy.generateDeck(who,deck);
   }
 
@@ -102,7 +122,7 @@ public class StandardHotStoneGame implements Game {
   }
 
   private void generateHand(Player who){
-    List<Card> tempHand = new ArrayList<>();
+    List<MutableCard> tempHand = new ArrayList<>();
     for(int i=0; i<3;i++){
       tempHand.add(0,deck.get(who).get(i));
     }
@@ -112,9 +132,16 @@ public class StandardHotStoneGame implements Game {
     hand.put(who,tempHand);
   }
   private void generateEmptyField(Player who){
-    ArrayList<Card> field1 = new ArrayList<>();
+    ArrayList<MutableCard> field1 = new ArrayList<>();
     field.put(who,field1);
   }
+  private void generateEmptyAttackOutput(Player who){
+    totalAttackOutput.put(who,0);
+  }
+  public List<MutableCard> getFieldList(Player who){
+    return field.get(who);
+  }
+
 
 
   @Override
@@ -128,7 +155,10 @@ public class StandardHotStoneGame implements Game {
 
   @Override
   public Player getWinner() {
-    return winnerStrategy.getWinner(this);
+    Player winner = winnerStrategy.getWinner(this);
+
+    //observerHandler.notifyGameWon(winner);
+    return winner;
     //return null;
   }
 
@@ -180,10 +210,17 @@ public class StandardHotStoneGame implements Game {
     if(turnNumber % 2 == 0){ //computes roundNumber 2TurnNumber=1roundNumber
       roundNumber++;
     }
-    HeroImpl h = heroes.get(currentPlayerInTurn);
-    List<Card> d = deck.get(currentPlayerInTurn);
+    observerHandler.notifyTurnChangeTo(currentPlayerInTurn);
+    MutableHero hero = heroes.get(currentPlayerInTurn);
     manaProductionStrategy.manaProduction(currentPlayerInTurn,this);
-    h.setActive(true);
+    observerHandler.notifyHeroUpdate(hero.getOwner());
+
+    hero.setActive(true);
+    observerHandler.notifyHeroUpdate(hero.getOwner());
+    drawCardFromDeck(currentPlayerInTurn);
+    setMinionOnFieldActive();
+  }
+  /*public void drawCard(MutableHero h, List<? extends MutableCard> d ){
     if(d.isEmpty()){
       h.setHealth(h.getHealth()-2);
     }
@@ -191,11 +228,14 @@ public class StandardHotStoneGame implements Game {
       hand.get(currentPlayerInTurn).add(0, d.get(0)); //adds card from deck to the hand.
       d.remove(0);
     }
+  }*/
+  private void setMinionOnFieldActive(){
     //sets minions on field active
     if (field.get(currentPlayerInTurn) != null) {
-      for (Card c : field.get(currentPlayerInTurn)) {
+      for (MutableCard c : field.get(currentPlayerInTurn)) {
         if (!(c.isActive())) {
-          ((CardImpl) c).setActive(true);
+          setCardActiveState(c,true);
+          observerHandler.notifyCardUpdate(c);
         }
       }
     }
@@ -203,7 +243,7 @@ public class StandardHotStoneGame implements Game {
 
   @Override
   public Status playCard(Player who, Card card) {
-    HeroImpl h = (HeroImpl) getHero(who);
+    MutableHero h = (MutableHero) getHero(who);
 
     if(!(who == getPlayerInTurn())){
       return Status.NOT_PLAYER_IN_TURN;
@@ -214,41 +254,57 @@ public class StandardHotStoneGame implements Game {
     if(getHero(who).getMana()<card.getManaCost()){
       return Status.NOT_ENOUGH_MANA;
     }
-    h.setMana(h.getMana()- card.getManaCost()); //updates mana  when card is played
-    field.get(who).add(0,card); //updates field when card is played
+    deltaHeroMana(who,h.getMana()- card.getManaCost());
+    //h.setMana(h.getMana()- card.getManaCost()); //updates mana  when card is played
+    addCardToField(who,card);
     hand.get(who).remove(card);
+    //field.get(who).add(0, (MutableCard) card); //updates field when card is played
+    effectStrategy.applyCardEffects(this,who,card);
+    observerHandler.notifyCardUpdate(card);
+    observerHandler.notifyPlayCard(who,card);
 
     return Status.OK;
   }
 
   @Override
   public Status attackCard(Player playerAttacking, Card attackingCard, Card defendingCard) {
+    boolean attackOnOwnMinion = defendingCard.getOwner().equals(getPlayerInTurn()) && attackingCard.getOwner().equals(getPlayerInTurn());
+    boolean ownerOfAttackCard = attackingCard.getOwner().equals(getPlayerInTurn());
     if(getPlayerInTurn() != playerAttacking){
       return Status.NOT_PLAYER_IN_TURN;
     }
-
     if(!(attackingCard.isActive())){
       return Status.ATTACK_NOT_ALLOWED_FOR_NON_ACTIVE_MINION;
     }
-    if(defendingCard.getOwner().equals(getPlayerInTurn()) && attackingCard.getOwner().equals(getPlayerInTurn())){
+    if(attackOnOwnMinion){
       return Status.ATTACK_NOT_ALLOWED_ON_OWN_MINION;
     }
-    if(!attackingCard.getOwner().equals(getPlayerInTurn())){
+    if(!ownerOfAttackCard){
       return Status.NOT_OWNER;
     }
-    ((CardImpl)attackingCard).setHealth(attackingCard.getHealth()-defendingCard.getAttack());
-    ((CardImpl)defendingCard).setHealth(defendingCard.getHealth()-attackingCard.getAttack());
+    winnerStrategy.setTotalAttackOutput(playerAttacking, (MutableCard) attackingCard,totalAttackOutput);
 
+    deltaCardHealth(attackingCard,(attackingCard.getHealth()-defendingCard.getAttack()));
+    deltaCardHealth(defendingCard,(defendingCard.getHealth()-attackingCard.getAttack()));
+
+    checkMinionsFor0Health(playerAttacking,attackingCard,defendingCard);
+    observerHandler.notifyAttackCard(playerAttacking,attackingCard,defendingCard);
+    observerHandler.notifyGameWon(playerAttacking);
+
+    return Status.OK;
+  }
+
+  private void checkMinionsFor0Health(Player playerAttacking, Card attackingCard, Card defendingCard){
     if(attackingCard.getHealth() <=0){
-      field.get(playerAttacking).remove(attackingCard);
+      removeCardFromField(playerAttacking,attackingCard);
     }
     else{
-      ((CardImpl) attackingCard).setActive(false);
+      //((CardImpl) attackingCard).setActive(false);
+      setCardActiveState(attackingCard,false);
     }
     if(defendingCard.getHealth() <=0){
-      field.get(defendingCard.getOwner()).remove(defendingCard);
+      removeCardFromField(defendingCard.getOwner(),defendingCard);
     }
-    return Status.OK;
   }
 
   @Override
@@ -263,12 +319,26 @@ public class StandardHotStoneGame implements Game {
       return Status.NOT_OWNER;
     }
 
-    heroes.get(Utility.computeOpponent(playerAttacking))
-            .setHealth(heroes.get(Utility.computeOpponent(playerAttacking))
-            .getHealth()-attackingCard.getAttack());
-    ((CardImpl)attackingCard).setActive(false);
-   return Status.OK;
+    Player opponentPlayer = Utility.computeOpponent(playerAttacking);
+    MutableHero opponentHero = heroes.get(opponentPlayer);
+    winnerStrategy.setTotalAttackOutput(playerAttacking, attackingCard,totalAttackOutput);
 
+    int opponentHeroHealthAfterAttacked = opponentHero.getHealth()-attackingCard.getAttack();
+    //deltaHeroHealth(opponentPlayer,);
+    opponentHero.setHealth(opponentHeroHealthAfterAttacked);
+    //((CardImpl)attackingCard).setActive(false);
+    setCardActiveState(attackingCard,false);
+    observerHandler.notifyCardUpdate(attackingCard);
+    observerHandler.notifyHeroUpdate(opponentPlayer);
+    observerHandler.notifyAttackHero(playerAttacking,attackingCard);
+    observerHandler.notifyGameWon(playerAttacking);
+
+    return Status.OK;
+
+  }
+
+  public int getTotalAttackOutput(Player who){
+    return totalAttackOutput.get(who);
   }
 
   @Override
@@ -277,16 +347,105 @@ public class StandardHotStoneGame implements Game {
       return Status.NOT_PLAYER_IN_TURN;
     }
     if (getHero(who).getMana() < 2) {
+      System.out.println("hero not enough mana " + getHero(who).getMana()+ " " + getHero(who).getOwner());
       return Status.NOT_ENOUGH_MANA;
     }
     if(!getHero(who).isActive()){
       return Status.POWER_USE_NOT_ALLOWED_TWICE_PR_ROUND;
     }
     ((HeroImpl) getHero(who)).setMana(getHero(who).getMana() - GameConstants.HERO_POWER_COST);
-    heroPowerStrategy.usePower(who,this);
-    ((HeroImpl) getHero(who)).setActive(false);
+    effectStrategy.usePower(who,this);
+    //((HeroImpl) getHero(who)).setActive(false);
+    setHeroActiveState(who,false);
+    observerHandler.notifyUsePower(who);
 
     //((HeroImpl))getHero(who).
     return Status.OK;
+  }
+
+  @Override
+  public void setHeroActiveState(Player who, boolean isActive) {
+    ((MutableHero)getHero(who)).setActive(isActive);
+    observerHandler.notifyHeroUpdate(who);
+  }
+
+  @Override
+  public void setCardActiveState(Card card, boolean isActive) {
+    ((MutableCard)card).setActive(isActive);
+    observerHandler.notifyCardUpdate(card);
+  }
+
+  @Override
+  public void deltaCardHealth(Card card, int value) {
+    ((MutableCard)card).setHealth(value);
+    observerHandler.notifyCardUpdate(card);
+
+  }
+
+  @Override
+  public void deltaHeroMana(Player who, int manaValue) {
+    MutableHero playerHero = (MutableHero) getHero(who);
+    playerHero.setMana(manaValue);
+    observerHandler.notifyHeroUpdate(who);
+  }
+
+  @Override
+  public void deltaHeroHealth(Player who, int healthValue) {
+    MutableHero playerHero = (MutableHero) getHero(who);
+    playerHero.setHealth(healthValue);
+    observerHandler.notifyHeroUpdate(who);
+  }
+
+  @Override
+  public void drawCardFromDeck(Player who) {
+    if(deck.get(who).isEmpty()){
+      ((MutableHero)getHero(who)).setHealth(getHero(who).getHealth()-2);
+      observerHandler.notifyHeroUpdate(who);
+    }
+    else{
+      hand.get(currentPlayerInTurn).add(0, deck.get(who).get(0)); //adds card from deck to the hand.
+      observerHandler.notifyCardDraw(who,deck.get(who).get(0));
+      deck.get(who).remove(0);
+    }
+  }
+
+  @Override
+  public void addCardToField(Player who, Card card) {
+    field.get(who).add(0, (MutableCard) card);
+  }
+
+  @Override
+  public void deltaFieldCardHealth(Player who, int fieldIndex, int delta) {
+    MutableCard c = ((MutableCard)getCardInField(who,fieldIndex)); //best to make getMutableCardInField in MutableCard
+    c.setHealth(delta);
+    observerHandler.notifyCardUpdate(c);
+  }
+
+  @Override
+  public void deltaFieldCardAttack(Player who, int fieldIndex, int delta) {
+    MutableCard c = ((MutableCard)getCardInField(who,fieldIndex));
+    c.setAttack(delta);
+    observerHandler.notifyCardUpdate(c);
+  }
+
+  @Override
+  public void removeCardFromField(Player who, Card card) {
+    field.get(who).remove(card);
+    observerHandler.notifyCardRemove(who,card);
+  }
+
+  @Override
+  public ArrayList<MutableCard> getFieldArray(Player who) {
+    return (ArrayList<MutableCard>) field.get(who);
+  }
+
+  @Override
+  public ObserverHandler getObserverHandler() {
+    return observerHandler;
+  }
+
+  @Override
+  public void addObserver(GameObserver observer) {
+    observerHandler.addObserver(observer);
   }
 }

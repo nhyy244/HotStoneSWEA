@@ -1,15 +1,19 @@
 package hotstone.standard;
 
 import hotstone.framework.Card;
+import hotstone.framework.MutableCard;
 import hotstone.framework.Player;
 
-public class CardImpl implements Card {
+import java.util.UUID;
+
+public class CardImpl implements Card,MutableCard {
     private String name;
     private int manaCost;
     private int health;
     private int attack;
     private boolean active;
     private Player owner;
+    private String id;
 
     public CardImpl(String name, int manaCost, int attack, int health,boolean active,Player owner ){
         this.name=name;
@@ -18,6 +22,7 @@ public class CardImpl implements Card {
         this.attack=attack;
         this.active=active;
         this.owner=owner;
+        id = UUID.randomUUID().toString();
     }
     @Override
     public String getName() {
@@ -43,24 +48,33 @@ public class CardImpl implements Card {
     public boolean isActive() {
         return active;
     }
-    public void setActive(boolean isActive){
-        this.active=isActive;
-    }
-
     @Override
     public Player getOwner() {
         return owner;
     }
 
-    public void setOwner(Player owner){
-        this.owner = owner;
+    @Override
+    public void setActive(boolean active) {
+        this.active=active;
     }
 
-    public void setHealth(int health){
+    @Override
+    public void setAttack(int attack) {
+        this.attack=attack;
+    }
+
+    @Override
+    public void setHealth(int health) {
         this.health=health;
     }
 
-    public void setMana(int manaCost){
-        this.manaCost=manaCost;
+    @Override
+    public void setMana(int mana) {
+        this.manaCost=mana;
+    }
+
+    @Override
+    public String getID() {
+        return id;
     }
 }

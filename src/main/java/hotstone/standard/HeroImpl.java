@@ -2,23 +2,26 @@ package hotstone.standard;
 
 import hotstone.framework.Card;
 import hotstone.framework.Hero;
+import hotstone.framework.MutableHero;
 import hotstone.framework.Player;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
-public class HeroImpl implements Hero {
+public class HeroImpl implements Hero, MutableHero {
     private int mana;
     private int health;
     private String type;
     private Player owner;
     private String heroPower;
     private boolean active;
-
+    private String id;
 
     public HeroImpl(String type, Player owner,String heroPower) {
         this.health = GameConstants.HERO_MAX_HEALTH;
         this.type = type;
         this.owner = owner;
+        id = UUID.randomUUID().toString();
         //this.mana=0;
         this.heroPower = heroPower;
         this.active=false;
@@ -53,17 +56,28 @@ public class HeroImpl implements Hero {
         return owner;
     }
 
+    @Override
     public void setMana(int mana) {
-        this.mana = mana;
+        this.mana=mana;
     }
+
+    @Override
     public void setHealth(int health) {
-        this.health = health;
+        this.health=health;
     }
-    public void setActive(boolean active){
+
+    @Override
+    public void setActive(boolean active) {
         this.active=active;
     }
 
+    @Override
     public String getHeroPower() {
         return heroPower;
+    }
+
+    @Override
+    public String getID() {
+        return id;
     }
 }

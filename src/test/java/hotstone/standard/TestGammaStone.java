@@ -3,17 +3,10 @@ package hotstone.standard;
 import hotstone.framework.Game;
 import hotstone.framework.Hero;
 import hotstone.framework.Player;
-import hotstone.variants.*;
+import hotstone.variants.factory.GammaStoneFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import hotstone.framework.*;
-import hotstone.utility.TestHelper;
-import hotstone.variants.FindusWinsAt4RoundsStrategy;
-import hotstone.variants.ManaProductionAlphaStone;
-import org.junit.jupiter.api.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,9 +18,7 @@ public class TestGammaStone {
 
     @BeforeEach
     public void setUp(){
-        game = new StandardHotStoneGame(new FindusWinsAt4RoundsStrategy(),new ManaProductionAlphaStone(),
-                new HeroGenerationStrategyGamma(), new HeroPowerGammaStone(),
-                new GenerateDeckStrategyAlpha());
+        game = new StandardHotStoneGame(new GammaStoneFactory());
     }
 
     @Test
